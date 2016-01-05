@@ -184,3 +184,48 @@ claims.Add(new Claim(ClaimTypes.Role, "Administrator", ClaimValueTypes.String, I
 ```
 
 * Run the application and confirm you are logged in.
+
+Step 4: Simple Policies
+=======================
+* Return to startup.cs and locate the services.AddAuthorization() call.
+* Add a policy to the configuration 
+
+```c#
+services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdministratorOnly", policy => policy.RequireRole("Administrator"));
+});
+```
+
+* Now change the Home controller `Authorize` attribute to require a policy, rather than use the role parameter.
+
+```c#
+[Authorize(Policy = "AdministratorOnly")]
+```
+
+* Run the app and confirm you still see the home page.
+* Now add a second policy, this time requiring a claim.
+
+```c#
+services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdministratorOnly", policy => policy.RequireRole("Administrator"));
+    options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId"));
+});
+```
+
+* Add a suitable claim to the `Unauthorized` action in the `Account` Controller.
+
+```c#
+claims.Add(new Claim("EmployeeId", string.Empty, ClaimValueTypes.String, Issuer));
+```
+
+* Run the app and ensure you can see the home page.
+* This is a rather useless check though. Claims have values. You really want to check the values and not just the presence of a claim. Luckily there’s a parameter for that. Change the EmployeeId policy to require one of a number of values;
+
+```c#
+options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123", "456"));
+```
+
+* Run the app again and the empty claim will be rejected and end up at the Forbidden page. 
+* Add a suitable claim value to the Unauthorized action and try again.
