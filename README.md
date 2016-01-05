@@ -50,3 +50,88 @@ namespace AuthorizationLab.Controllers
 ```
 
 * Add a `Home` folder inside the `Views` folder. Add an `Index.cshtml` file inside that folder, and edit it to say Hello World.
+
+Step 1: Setup authorization
+===========================
+
+* Add the `Microsoft.AspNet.Authorization` nuget package.
+* Add the `Microsoft.AspNet.Authentication.Cookies nuget` package
+* Add `services.AddAuthorization()` at the top of the `ConfigureServices()` method.
+* Edit the Home controller and add the `[Authorize]` attribute to the controller.
+* Run the project and panic. You get a blank page. Open the IE Dev Tools, click Network and refresh and you will see you get a 401.
+* Add cookie middleware into Configure()
+
+```c#
+app.UseCookieAuthentication(options =>
+{
+    options.AuthenticationScheme = "Cookie";
+    options.LoginPath = new PathString("/Account/Unauthorized/");
+    options.AccessDeniedPath = new PathString("/Account/Forbidden/");
+    options.AutomaticAuthenticate = true;
+    options.AutomaticChallenge = true;
+});
+```
+
+* Now create an `Account` controller. Create an `Unauthorized()` action and a `Forbidden()` action.
+
+```c#
+using Microsoft.AspNet.Mvc;
+
+namespace AuthorizationLab.Controllers
+{
+    public class AccountController : Controller
+    {
+        public IActionResult Unauthorized()
+        {
+            return View();
+        }
+
+        public IActionResult Forbidden()
+        {
+            return View();
+        }
+    }
+}
+```
+
+* Create an `Account` folder in the `View` folder and create corresponding views for the actions. Add some text so you know the right one is being hit.
+* Change the `Unauthorized` action to create a principal and persist it.
+
+```c#
+public async Task<IActionResult> Unauthorized(string returnUrl = null)
+{
+    const string Issuer = "https://contoso.com";
+    List<Claim> claims = new List<Claim>();
+    claims.Add(new Claim(ClaimTypes.Name, "barry", ClaimValueTypes.String, Issuer));
+    var userIdentity = new ClaimsIdentity("SuperSecureLogin");
+    userIdentity.AddClaims(claims);
+    var userPrincipal = new ClaimsPrincipal(userIdentity);
+
+    await HttpContext.Authentication.SignInAsync("Cookie", userPrincipal,
+        new AuthenticationProperties
+        {
+            ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
+            IsPersistent = false,
+            AllowRefresh = false
+        });
+
+    return RedirectToLocal(returnUrl);
+}
+```
+
+* Finally edit the Index view to display the name claim for the identity. 
+
+```
+@using System.Security.Claims;
+
+@if (!User.Identities.Any(u => u.IsAuthenticated))
+{
+    <h1>Hello World</h1>
+}
+else
+{
+    <h1>Hello @User.Identities.First(u => u.IsAuthenticated && 
+                                     u.HasClaim(c => c.Type == ClaimTypes.Name))
+                                    .FindFirst(ClaimTypes.Name).Value</h1>
+}
+```
