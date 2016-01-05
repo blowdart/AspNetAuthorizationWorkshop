@@ -166,3 +166,21 @@ services.AddMvc(config =>
 
 * Run and watch everything blow up into an infinite redirect loop. Why? You've made every page require authentication, even the login pages. 
 * Now add `[AllowAnonymous]` to the `Account` controller, run again and see the user is logged in.
+
+Step 3: Roles
+=============
+
+* Go to the `Home` controller and add an `Authorize` attribute with a role demand;
+
+```c#
+[Authorize(Roles = "Administrator")]
+```
+
+* Run the application and confirm you are redirected to the `Forbidden` view.
+* Return to the `AccountController` and add a Role claim to the issued identity.
+
+```c#
+claims.Add(new Claim(ClaimTypes.Role, "Administrator", ClaimValueTypes.String, Issuer));
+```
+
+* Run the application and confirm you are logged in.
