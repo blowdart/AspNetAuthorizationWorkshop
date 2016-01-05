@@ -147,3 +147,22 @@ else
                                     .FindFirst(ClaimTypes.Name).Value</h1>
 }
 ```
+
+Step 2: Authorize all the things
+================================
+
+* First remove the `Authorize` attribute from the `Home` controller.
+* Change `ConfigureServices()` in `startup.cs` to add a default policy to thee MVC configuration
+
+```c#
+services.AddMvc(config =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+                     .RequireAuthenticatedUser()
+                     .Build();
+    config.Filters.Add(new AuthorizeFilter(policy));
+});
+```
+
+* Run and watch everything blow up into an infinite redirect loop. Why? You've made every page require authentication, even the login pages. 
+* Now add `[AllowAnonymous]` to the `Account` controller, run again and see the user is logged in.
