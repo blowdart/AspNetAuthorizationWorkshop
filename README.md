@@ -117,6 +117,18 @@ public async Task<IActionResult> Unauthorized(string returnUrl = null)
 
     return RedirectToLocal(returnUrl);
 }
+
+private IActionResult RedirectToLocal(string returnUrl)
+{
+    if (Url.IsLocalUrl(returnUrl))
+    {
+        return Redirect(returnUrl);
+    }
+    else
+    {
+        return RedirectToAction("Index", "Home");
+    }
+}
 ```
 
 * Finally edit the Index view to display the name claim for the identity. 
