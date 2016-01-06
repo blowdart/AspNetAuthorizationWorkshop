@@ -229,3 +229,67 @@ options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123
 
 * Run the app again and the empty claim will be rejected and end up at the Forbidden page. 
 * Add a suitable claim value to the Unauthorized action and try again.
+
+Step 5: Code Based Policies
+===========================
+
+Code based policies consist of a requirement, implementing `IAuthorizationRequirement` and a handler for the requirement, implementing `AuthorizationHandler<T>` where T is the requirement.
+
+* Add a date of birth claim to the user principal in the Unauthorized action in the Account Controller
+
+```c#
+claims.Add(new Claim(ClaimTypes.DateOfBirth, "1970-06-08", ClaimValueTypes.Date));
+```
+
+* Now create a custom requirement and handler class; called MinimumAgeRequirement
+
+```c#
+using System;
+using System.Security.Claims;
+using Microsoft.AspNet.Authorization;
+
+namespace AuthorizationLab
+{
+    public class MinimumAgeRequirement : AuthorizationHandler<MinimumAgeRequirement>, IAuthorizationRequirement
+    {
+        int _minimumAge;
+
+        public MinimumAgeRequirement(int minimumAge)
+        {
+            _minimumAge = minimumAge;
+        }
+
+        protected override void Handle(AuthorizationContext context, MinimumAgeRequirement requirement)
+        {
+            if (!context.User.HasClaim(c => c.Type == ClaimTypes.DateOfBirth))
+            {
+                return;
+            }
+
+            var dateOfBirth = Convert.ToDateTime(
+                context.User.FindFirst(c => c.Type == ClaimTypes.DateOfBirth).Value);
+
+            int calculatedAge = DateTime.Today.Year - dateOfBirth.Year;
+            if (dateOfBirth > DateTime.Today.AddYears(-calculatedAge))
+            {
+                calculatedAge--;
+            }
+
+            if (calculatedAge >= _minimumAge)
+            {
+                context.Succeed(requirement);
+            }
+        }
+    }
+}
+```
+
+* Create an Over21 policy in the AddAuthorization function;
+
+```c#
+options.AddPolicy("Over21Only", policy => policy.Requirements.Add(new MinimumAgeRequirement(21)));
+```
+
+* Apply it to the `Home` controller using the `Authorize` attribute.
+* Run the app and ensure you can see the home page.
+* Experiment with the date of birth value to make authorization fail.
