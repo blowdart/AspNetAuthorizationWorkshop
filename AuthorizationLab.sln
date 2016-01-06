@@ -27,6 +27,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step 5 - Code Based Policie
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step 6 - Multiple Handlers for a Requirement", "src\Step 6 - Multiple Handlers for a Requirement\Step 6 - Multiple Handlers for a Requirement.xproj", "{1570A4E5-CABB-480B-9587-2A73A926784A}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step 7 - Resource Based Requirements", "src\Step 7 - Resource Based Requirements\Step 7 - Resource Based Requirements.xproj", "{179A8C19-E00A-4D6A-BB7F-E62F8D5CA040}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{1570A4E5-CABB-480B-9587-2A73A926784A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1570A4E5-CABB-480B-9587-2A73A926784A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1570A4E5-CABB-480B-9587-2A73A926784A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{179A8C19-E00A-4D6A-BB7F-E62F8D5CA040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{179A8C19-E00A-4D6A-BB7F-E62F8D5CA040}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{179A8C19-E00A-4D6A-BB7F-E62F8D5CA040}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{179A8C19-E00A-4D6A-BB7F-E62F8D5CA040}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,5 +84,6 @@ Global
 		{B73EC4C5-A4F6-46A6-86F6-241534DFA55E} = {34445EFF-069B-43C5-B893-3D62EE196328}
 		{77BE6945-34F6-4067-9041-D7E35137A4E1} = {34445EFF-069B-43C5-B893-3D62EE196328}
 		{1570A4E5-CABB-480B-9587-2A73A926784A} = {34445EFF-069B-43C5-B893-3D62EE196328}
+		{179A8C19-E00A-4D6A-BB7F-E62F8D5CA040} = {34445EFF-069B-43C5-B893-3D62EE196328}
 	EndGlobalSection
 EndGlobal

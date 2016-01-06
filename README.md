@@ -430,3 +430,274 @@ claims.Add(new Claim("TemporaryBadgeExpiry",
 
 * Rerun the app and you’ll see you’re forbidden.
 * Remove the temporary badge claim and uncomment the badgenumber claim.
+
+Step 7: Resource Based Requirements
+===================================
+
+So far we’ve covered requirements that are based only on a user’s identity. However often authorization requires the resource being accessed. For example a Document class may have an author and only authors can edit the document, whilst others can view it.
+
+* Create a resource class, `Document` with an int ID property and a string Author property.
+
+```c#
+namespace AuthorizationLab
+{
+    public class Document
+    {
+        public int Id { get; set; }
+        public string Author { get; set; }
+    }
+}
+```
+
+* Create a repository interface for the Document class, `IDocumentRepository`
+
+```c#
+using System.Collections.Generic;
+
+namespace AuthorizationLab
+{
+    public interface IDocumentRepository
+    {
+        IEnumerable<Document> Get();
+
+        Document Get(int id);
+    }
+}
+```
+
+Create an implementation of the repository, with some test documents, `DocumentRepository.cs`
+
+```c#
+using System.Collections.Generic;
+using System.Linq;
+
+namespace AuthorizationLab
+{
+    public class DocumentRepository : IDocumentRepository
+    {
+        static List<Document> _documents = new List<Document> {
+            new Document { Id = 1, Author = "barry" },
+            new Document { Id = 2, Author = "someoneelse" }
+        };
+
+        public IEnumerable<Document> Get()
+        {
+            return _documents;
+        }
+
+        public Document Get(int id)
+        {
+            return (_documents.FirstOrDefault(d => d.Id == id));
+        }
+    }
+}
+```
+
+*Finally register the document repository in the services collection through the ConfigureServices() method in startup.cs
+services.AddSingleton<IDocumentRepository, DocumentRepository>();
+
+Now we can create a suitable controller and views to display a list of documents and the document itself.
+
+* First create a Document controller in the Controllers folder, DocumentController.cs
+
+```c#
+using Microsoft.AspNet.Mvc;
+
+namespace AuthorizationLab.Controllers
+{
+    public class DocumentController : Controller
+    {
+        IDocumentRepository _documentRepository;
+
+        public DocumentController(IDocumentRepository documentRepository)
+        {
+            _documentRepository = documentRepository;
+        }
+
+        public IActionResult Index()
+        {
+            return View(_documentRepository.Get());
+        }
+
+        public IActionResult Edit(int id)
+        {
+            var document = _documentRepository.Get(id);
+
+            if (document == null)
+            {
+                return new HttpNotFoundResult();
+            }
+
+            return View(document);
+        }
+    }
+}
+```
+
+* Create an Document folder underneath the views folder and create Index view, index.cshtml
+
+```
+@using AuthorizationLab
+@model IEnumerable<Document>
+
+<h1>Document Library</h1>
+@foreach (var document in Model)
+{
+    <p>
+        @Html.ActionLink("Document #"+document.Id, "Edit",  new { id = document.Id })
+    </p>
+}
+```
+
+* Create an Edit view in the Document view folder, Edit.cshtml
+
+```
+@using AuthorizationLab
+@model Document
+
+<h1>Document #@Model.Id</h1>
+<h2>Author: @Model.Author</h2>
+```
+
+* Run the app and load the /Document URL. Ensure you see a list of documents and you can click into each one.
+
+Now we need to define operations to authorize against. For a document this might be Read, Write, Edit and Delete. We provide a base class, OperationAuthorizationRequirement which you can use as a starting point, but it’s optional.
+
+* Define an requirement for editing, `EditRequirement.cs`
+
+```c#
+using Microsoft.AspNet.Authorization;
+
+namespace AuthorizationLab
+{
+    public class EditRequirement : IAuthorizationRequirement
+    {
+    }
+}
+```
+
+Now, as before, we write a handler, but this time we write a handler which takes a resource. 
+
+* Create a DocumentEditHandler, `DocumentEditHandler.cs`. This time specify a resource type as well as the requirement in the class definition.
+
+``` c#
+using System.Security.Claims;
+using Microsoft.AspNet.Authorization;
+
+namespace AuthorizationLab
+{
+    public class DocumentEditHandler : AuthorizationHandler<EditRequirement, Document>
+    {
+        protected override void Handle(AuthorizationContext context, 
+                                       EditRequirement requirement, 
+                                       Document resource)
+        {
+            if (resource.Author == context.User.FindFirst(ClaimTypes.Name).Value)
+            {
+                context.Succeed(requirement);
+            }
+        }
+    }
+}
+```
+
+* Finally register the handler in `ConfigureServices()` in `Startup.cs`
+
+```c#
+services.AddSingleton<IAuthorizationHandler, DocumentEditHandler>();
+```
+
+We cannot use resource handlers in attributes, because binding hasn’t happened at that point and we need the resource. So we must call the authorization service directly.
+
+* Return to the Document controller and edit the constructor to include IAuthorizationService as one of its parameters and store it in a local variable.
+
+```c#
+using Microsoft.AspNet.Authorization;
+using Microsoft.AspNet.Mvc;
+
+namespace AuthorizationLab.Controllers
+{
+    public class DocumentController : Controller
+    {
+        IDocumentRepository _documentRepository;
+        IAuthorizationService _authorizationService;
+
+        public DocumentController(IDocumentRepository documentRepository, 
+                                  IAuthorizationService authorizationService)
+        {
+            _documentRepository = documentRepository;
+            _authorizationService = authorizationService;
+        }
+
+        public IActionResult Index()
+        {
+            return View(_documentRepository.Get());
+        }
+
+        public IActionResult Edit(int id)
+        {
+            var document = _documentRepository.Get(id);
+
+            if (document == null)
+            {
+                return new HttpNotFoundResult();
+            }
+
+            return View(document);
+        }
+    }
+}
+```
+
+Finally we can call the service. 
+
+* In the Edit action change it to be async, returning a `Task<IActionResult>` and call the `_authorizeService.AuthorizeAsync` method with the user, resource and the requirement. If the authorization call fails you should return a `ChallengeResult();`
+
+```c#
+using System.Threading.Tasks;
+using Microsoft.AspNet.Authorization;
+using Microsoft.AspNet.Mvc;
+
+namespace AuthorizationLab.Controllers
+{
+    public class DocumentController : Controller
+    {
+        IDocumentRepository _documentRepository;
+        IAuthorizationService _authorizationService;
+
+        public DocumentController(IDocumentRepository documentRepository, 
+                                  IAuthorizationService authorizationService)
+        {
+            _documentRepository = documentRepository;
+            _authorizationService = authorizationService;
+        }
+
+        public IActionResult Index()
+        {
+            return View(_documentRepository.Get());
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var document = _documentRepository.Get(id);
+
+            if (document == null)
+            {
+                return new HttpNotFoundResult();
+            }
+
+            if (await _authorizationService.AuthorizeAsync(User, document, new EditRequirement()))
+            {
+                return View(document);
+            }
+            else
+            {
+                return new ChallengeResult();
+            }
+        }
+    }
+}
+```
+
+* Run the app and go to the Document URL. You should be able to click through and see Document 1 but not Document 2.
+
