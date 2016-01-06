@@ -701,3 +701,48 @@ namespace AuthorizationLab.Controllers
 
 * Run the app and go to the Document URL. You should be able to click through and see Document 1 but not Document 2.
 
+Step 8: Authorizing in Views
+============================
+
+For resource links and other UI elements you probably want to not show those to users in the UI (but you still want to keep authorization checks in the Controller – never rely solely on UI element removal as a security mechanism). ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to hide documents in the document list the current user cannot access.
+
+* Open the Index view file, `index.cshtml` in the `Documents` folder. 
+* Add an @using statement for `Microsoft.AspNet.Authorization` and inject the `AuthorizationService` using the `@inject` command
+
+```
+@using Microsoft.AspNet.Authorization
+@using AuthorizationLab
+@model IEnumerable<Document>
+@inject IAuthorizationService AuthorizationService
+
+<h1>Document Library</h1>
+@foreach (var document in Model)
+{
+    <p>
+        @Html.ActionLink("Document #"+document.Id, "Edit",  new { id = document.Id })
+    </p>
+}
+```
+
+* Now within the `foreach` loop in the view you can call the `AuthorizationService` in the same way you did with a controller.
+
+```
+@using Microsoft.AspNet.Authorization
+@using AuthorizationLab
+
+@model IEnumerable<Document>
+@inject IAuthorizationService AuthorizationService
+
+<h1>Document Library</h1>
+@foreach (var document in Model)
+{
+    <p>
+        @if (await AuthorizationService.AuthorizeAsync(User, document, new EditRequirement()))
+        {
+            @Html.ActionLink("Document #" + document.Id, "Edit", new { id = document.Id })
+        }
+    </p>
+}
+```
+
+* Run the app and browser to the Document URL, and you will see that you now only have a link to Document #1.
