@@ -4,6 +4,8 @@ This is walk through for an ASP.NET Authorization Lab.
 
 [Authorization Documentation](https://docs.asp.net/en/latest/security/authorization/index.html).
 
+*Tip: When you stop the app always close the browser to clear the identity cookie.*
+
 Step 0: Preparation
 ===================
 
@@ -293,3 +295,138 @@ options.AddPolicy("Over21Only", policy => policy.Requirements.Add(new MinimumAge
 * Apply it to the `Home` controller using the `Authorize` attribute.
 * Run the app and ensure you can see the home page.
 * Experiment with the date of birth value to make authorization fail.
+
+Step 6: Multiple handlers for a requirement
+===========================================
+
+Sometimes you may want multiple handlers for an Authorization Requirement, 
+for example when there are multiple ways to fulfill a requirement. Microsoft's office doors 
+open with your Microsoft badge, however on days you forget your badge you can go to 
+reception and get a temporary pass and the receptionist will let you through the gates. 
+This would be implemented as two handlers for a single requirement.
+
+* First, write a new `IAuthorizationRequirement`, `OfficeEntryRequirement`
+
+```c#
+using Microsoft.AspNet.Authorization;
+
+namespace AuthorizationLab
+{
+    public class OfficeEntryRequirement : IAuthorizationRequirement
+    {
+    }
+}
+```
+
+* Now write an `AuthorizationHandler` that checks if the current identity has a badge number claim, 
+issued by the employer, `HasBadgeHandler`
+
+```c#
+using Microsoft.AspNet.Authorization;
+
+namespace AuthorizationLab
+{
+    public class HasBadgeHandler : AuthorizationHandler<OfficeEntryRequirement>
+    {
+        protected override void Handle(AuthorizationContext context, OfficeEntryRequirement requirement)
+        {
+            if (!context.User.HasClaim(c => c.Type == "BadgeNumber" && 
+                                            c.Issuer == "http://contoso.com"))
+            {
+                return;
+            }
+
+            context.Succeed(requirement);
+        }
+    }
+}
+```
+
+That takes care of people who remembered their badges. But what about those who forget and have 
+a temporary badge? You could just put it all in one handler, but handlers and requirements are 
+meant to be reusable. You could use the `HasBadgeHandler` above for other things, not just office entry 
+(for example our code signing infrastructure needs the smartcard that is our badge to trigger jobs)
+
+* To cope with temporary badges write another `AuthorizationHandler`, `HasTemporaryPassHandler`
+
+```c#
+using System;
+using Microsoft.AspNet.Authorization;
+
+namespace AuthorizationLab
+{
+    public class HasTemporaryPassHandler : AuthorizationHandler<OfficeEntryRequirement>
+    {
+        protected override void Handle(AuthorizationContext context, OfficeEntryRequirement requirement)
+        {
+            if (!context.User.HasClaim(c => c.Type == "TemporaryBadgeExpiry" &&
+                                            c.Issuer == "https://contoso.com"))
+            {
+                return;
+            }
+
+            var temporaryBadgeExpiry = 
+                Convert.ToDateTime(context.User.FindFirst(
+                                       c => c.Type == "TemporaryBadgeExpiry" &&
+                                       c.Issuer == "https://contoso.com").Value);
+
+            if (temporaryBadgeExpiry > DateTime.Now)
+            {
+                context.Succeed(requirement);
+            }
+        }
+    }
+}
+```
+
+* Next create a policy for the requirement, registering it in the `ConfigureServices()` in `startup.cs`, inside the authorization configuration
+
+```c#
+options.AddPolicy("BuildingEntry", policy => policy.Requirements.Add(new OfficeEntryRequirement()));
+```
+
+* Go back to the `Account` controller `Unauthorized` method and add a suitable badge ID claim.
+
+```c#
+claims.Add(new Claim("BadgeNumber", "123456", ClaimValueTypes.String, Issuer));
+```
+
+* Finally, apply the policy created to the `Index` view in the `Home` controller using the `Authorize` attribute.
+
+```c#
+[Authorize(Policy = "BuildingEntry")]
+```
+
+* Run the app and, oh dear, we get bounced to forbidden. Why?
+
+Handlers are held in the ASP.NET DI container. In our previous sample we combined the requirement and the handler in one class, so the authorization system knew about it. Now we have separate handlers we need to register them in the DI container before they can be found.
+
+* Open `startup.cs`, and inside `ConfigureServices()` register the handlers in the DI container.
+
+```c#
+services.AddSingleton<IAuthorizationHandler, HasBadgeHandler>();
+services.AddSingleton<IAuthorizationHandler, HasTemporaryPassHandler>();
+```
+
+* Run the app again and you can see authorization works. 
+* Experiment with commenting out the BadgeNumber claim and replacing it with a TemporaryBadgeExpiry claim
+
+```c#
+claims.Add(new Claim("TemporaryBadgeExpiry", 
+	                 DateTime.Now.AddDays(1).ToString(), 
+	                 ClaimValueTypes.String, 
+	                 Issuer));
+```
+
+* Run the app, and you’re still authorized.
+* Change the temporary badge claim so it has expired; 
+
+```c#
+claims.Add(new Claim("TemporaryBadgeExpiry", 
+	                 DateTime.Now.AddDays(-1).ToString(), 
+	                 ClaimValueTypes.String, 
+	                 Issuer));
+```
+
+* Rerun the app and you’ll see you’re forbidden.
+* Remove the temporary badge claim and uncomment the badgenumber claim.
