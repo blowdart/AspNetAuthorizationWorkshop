@@ -746,3 +746,26 @@ For resource links and other UI elements you probably want to not show those to 
 ```
 
 * Run the app and browser to the Document URL, and you will see that you now only have a link to Document #1.
+
+Applying what you've learned
+============================
+
+Open the `Exercises - Start` folder. 
+	
+This is a sample web site for inventory control. The site allows record label employees to update the details of albums.
+
+There are 3 users, barryd, davidfowl and dedwards. barryd is an administrator for Paddy Productions. dewards is an administrator for ToneDeaf Records. davidfowl is an employee of ToneDeaf Records, but not an administrator. Administrators are part of the Administrator role.
+
+A User repository has been provided for you and is injected into the `Account` controller. You should use the `ValidateLogin()` function to first check if the login is correct, then retrieve a suitable user principal using the `Get()` method. 
+
+The cookie authentication middleware is already configured, the instance name is available from the `Constants.MiddlewareScheme` field.
+
+Change the site to include the following functionality
+
+1. Change the `AccountController` `Login` action to create a cookie for the user logging in using the already configured cookie middleware.
+2. Make the entire site require a login, excluding the `Login` action in the `AccountController`.
+3. Make the `Edit` action in the `HomeController` only available to Administrators for any company.
+4. Make the Edit functionality only available to Administrators for the company that has issued the album.
+5. Change the `Index` action in the `HomeController` so it only lists albums from the company the current user belongs to and the edit link is only shown for administrators.
+
+A sample solution is containing in the `Exercises - Suggest Solution` folder.

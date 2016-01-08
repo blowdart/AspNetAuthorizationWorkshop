@@ -32,6 +32,10 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step 7 - Resource Based Req
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step 8 - Authorizing in Views", "src\Step 8 - Authorizing in Views\Step 8 - Authorizing in Views.xproj", "{1E3D9314-757E-430C-BF57-5F463CA6934E}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Exercises - Start", "src\Exercises - Start\Exercises - Start.xproj", "{6983837B-2717-4EA3-B4DC-76ED64BF6754}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Exercises - Suggested Solution", "src\Exercises - Suggested Solution\Exercises - Suggested Solution.xproj", "{6D215A6D-F0B0-4C42-894C-88F1B36FEDC3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +82,14 @@ Global
 		{1E3D9314-757E-430C-BF57-5F463CA6934E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E3D9314-757E-430C-BF57-5F463CA6934E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E3D9314-757E-430C-BF57-5F463CA6934E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6983837B-2717-4EA3-B4DC-76ED64BF6754}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6983837B-2717-4EA3-B4DC-76ED64BF6754}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6983837B-2717-4EA3-B4DC-76ED64BF6754}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6983837B-2717-4EA3-B4DC-76ED64BF6754}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D215A6D-F0B0-4C42-894C-88F1B36FEDC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D215A6D-F0B0-4C42-894C-88F1B36FEDC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D215A6D-F0B0-4C42-894C-88F1B36FEDC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D215A6D-F0B0-4C42-894C-88F1B36FEDC3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -93,5 +105,7 @@ Global
 		{1570A4E5-CABB-480B-9587-2A73A926784A} = {34445EFF-069B-43C5-B893-3D62EE196328}
 		{179A8C19-E00A-4D6A-BB7F-E62F8D5CA040} = {34445EFF-069B-43C5-B893-3D62EE196328}
 		{1E3D9314-757E-430C-BF57-5F463CA6934E} = {34445EFF-069B-43C5-B893-3D62EE196328}
+		{6983837B-2717-4EA3-B4DC-76ED64BF6754} = {34445EFF-069B-43C5-B893-3D62EE196328}
+		{6D215A6D-F0B0-4C42-894C-88F1B36FEDC3} = {34445EFF-069B-43C5-B893-3D62EE196328}
 	EndGlobalSection
 EndGlobal
