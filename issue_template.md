@@ -1,3 +1,3 @@
-### Have you tried turning it off and own again?
+### Have you tried turning it off and on again?
 
 ### Are you sure?
