@@ -493,8 +493,11 @@ namespace AuthorizationLab
 }
 ```
 
-*Finally register the document repository in the services collection through the ConfigureServices() method in startup.cs
+* Finally register the document repository in the services collection through the ConfigureServices() method in startup.cs
+
+```c#
 services.AddSingleton<IDocumentRepository, DocumentRepository>();
+```
 
 Now we can create a suitable controller and views to display a list of documents and the document itself.
 
