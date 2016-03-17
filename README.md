@@ -223,7 +223,7 @@ claims.Add(new Claim("EmployeeId", string.Empty, ClaimValueTypes.String, Issuer)
 ```
 
 * Run the app and ensure you can see the home page.
-* This is a rather useless check though. Claims have values. You really want to check the values and not just the presence of a claim. Luckily there’s a parameter for that. Change the EmployeeId policy to require one of a number of values;
+* This is a rather useless check though. Claims have values. You really want to check the values and not just the presence of a claim. Luckily thereâ€™s a parameter for that. Change the EmployeeId policy to require one of a number of values;
 
 ```c#
 options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123", "456"));
@@ -418,7 +418,7 @@ claims.Add(new Claim("TemporaryBadgeExpiry",
 	                 Issuer));
 ```
 
-* Run the app, and you’re still authorized.
+* Run the app, and youâ€™re still authorized.
 * Change the temporary badge claim so it has expired; 
 
 ```c#
@@ -428,13 +428,13 @@ claims.Add(new Claim("TemporaryBadgeExpiry",
 	                 Issuer));
 ```
 
-* Rerun the app and you’ll see you’re forbidden.
+* Rerun the app and youâ€™ll see youâ€™re forbidden.
 * Remove the temporary badge claim and uncomment the badgenumber claim.
 
 Step 7: Resource Based Requirements
 ===================================
 
-So far we’ve covered requirements that are based only on a user’s identity. However often authorization requires the resource being accessed. For example a Document class may have an author and only authors can edit the document, whilst others can view it.
+So far weâ€™ve covered requirements that are based only on a userâ€™s identity. However often authorization requires the resource being accessed. For example a Document class may have an author and only authors can edit the document, whilst others can view it.
 
 * Create a resource class, `Document` with an int ID property and a string Author property.
 
@@ -561,7 +561,7 @@ namespace AuthorizationLab.Controllers
 
 * Run the app and load the /Document URL. Ensure you see a list of documents and you can click into each one.
 
-Now we need to define operations to authorize against. For a document this might be Read, Write, Edit and Delete. We provide a base class, OperationAuthorizationRequirement which you can use as a starting point, but it’s optional.
+Now we need to define operations to authorize against. For a document this might be Read, Write, Edit and Delete. We provide a base class, OperationAuthorizationRequirement which you can use as a starting point, but itâ€™s optional.
 
 * Define an requirement for editing, `EditRequirement.cs`
 
@@ -607,7 +607,7 @@ namespace AuthorizationLab
 services.AddSingleton<IAuthorizationHandler, DocumentEditHandler>();
 ```
 
-We cannot use resource handlers in attributes, because binding hasn’t happened at that point and we need the resource. So we must call the authorization service directly.
+We cannot use resource handlers in attributes, because binding hasnâ€™t happened at that point and we need the resource. So we must call the authorization service directly.
 
 * Return to the Document controller and edit the constructor to include IAuthorizationService as one of its parameters and store it in a local variable.
 
@@ -704,7 +704,7 @@ namespace AuthorizationLab.Controllers
 Step 8: Authorizing in Views
 ============================
 
-For resource links and other UI elements you probably want to not show those to users in the UI (but you still want to keep authorization checks in the Controller – never rely solely on UI element removal as a security mechanism). ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to hide documents in the document list the current user cannot access.
+For resource links and other UI elements you probably want to not show those to users in the UI (but you still want to keep authorization checks in the Controller â€“ never rely solely on UI element removal as a security mechanism). ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to hide documents in the document list the current user cannot access.
 
 * Open the Index view file, `index.cshtml` in the `Documents` folder. 
 * Add an @using statement for `Microsoft.AspNet.Authorization` and inject the `AuthorizationService` using the `@inject` command
@@ -734,14 +734,17 @@ For resource links and other UI elements you probably want to not show those to 
 @inject IAuthorizationService AuthorizationService
 
 <h1>Document Library</h1>
-@foreach (var document in Model)
-{
-    <p>
-        @if (await AuthorizationService.AuthorizeAsync(User, document, new EditRequirement()))
-        {
-            @Html.ActionLink("Document #" + document.Id, "Edit", new { id = document.Id })
-        }
-    </p>
+@{
+    var editRequirement = new EditRequirement();
+    foreach (var document in Model)
+    {
+        <p>
+            @if (await AuthorizationService.AuthorizeAsync(User, document, editRequirement))
+            {
+                @Html.ActionLink("Document #" + document.Id, "Edit", new { id = document.Id })
+            }
+        </p>
+    }
 }
 ```
 
