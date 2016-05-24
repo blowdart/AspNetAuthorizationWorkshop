@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+
+namespace AuthorizationLab.Controllers
+{
+    [Authorize(Policy = "AdministratorOnly")]
+    [Authorize(Policy = "EmployeeId")]
+    [Authorize(Policy = "Over21Only")]
+    [Authorize(Policy = "BuildingEntry")]
+    public class HomeController : Controller
+    {
+        // GET: /<controller>/
+        public IActionResult Index()
+        {
+            return View();
+        }
+    }
+}

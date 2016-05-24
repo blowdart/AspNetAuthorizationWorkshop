@@ -1,0 +1,19 @@
+﻿<h1>Login</h1>
+
+@using (Html.BeginForm("Login", "Account", FormMethod.Post))
+{
+
+    @Html.AntiForgeryToken();
+
+    if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
+    {
+        <p>** @ViewBag.ErrorMessage **</p>
+
+    }
+
+    <p>User name: <input name="username" /></p>
+    <p>Password: <input name="password" type="password" /></p>
+    <p><input type="submit" value="Login" /></p>
+
+    <p>Valid usernames are barryd, dedward and davidfowl. Passwords aren't validated.</p>
+}

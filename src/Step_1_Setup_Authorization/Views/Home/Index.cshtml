@@ -1,0 +1,13 @@
+﻿@using System.Security.Claims;
+
+@if (!User.Identities.Any(u => u.IsAuthenticated))
+{
+    <h1>Hello World</h1>
+}
+else
+{
+    <h1>
+        Hello @User.Identities.First(u => u.IsAuthenticated &&
+                                     u.HasClaim(c => c.Type == ClaimTypes.Name)).FindFirst(ClaimTypes.Name).Value
+    </h1>
+}

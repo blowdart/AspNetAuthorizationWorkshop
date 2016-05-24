@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNet.Authorization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AuthorizationLab
 {

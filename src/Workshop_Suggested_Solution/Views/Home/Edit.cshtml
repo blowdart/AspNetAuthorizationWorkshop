@@ -1,0 +1,17 @@
+﻿@model Album
+@using AuthorizationWorkshop.Models
+@using System.Security.Claims
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken();
+    @Html.HiddenFor(m => m.Id)
+    <p>Title: @Html.TextBoxFor(m => m.Title)</p>
+    <p>Artist: @Html.TextBoxFor(m => m.Artist)</p>
+    <p>Publisher: @Model.Publisher</p>
+    <input type="submit" value="Edit" />
+}
+
+<p>@Html.ActionLink("Home", "Index", "Home")</p>

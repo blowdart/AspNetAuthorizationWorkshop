@@ -1,0 +1,16 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@using AuthorizationLab
+
+@model IEnumerable<Document>
+@inject IAuthorizationService AuthorizationService
+
+<h1>Document Library</h1>
+@foreach (var document in Model)
+{
+    <p>
+        @if (await AuthorizationService.AuthorizeAsync(User, document, new EditRequirement()))
+        {
+            @Html.ActionLink("Document #" + document.Id, "Edit", new { id = document.Id })
+        }
+    </p>
+}

@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Album>
+@using AuthorizationWorkshop
+@using AuthorizationWorkshop.Models
+
+@using System.Security.Claims
+
+@if (!User.Identities.Any(u => u.IsAuthenticated))
+{
+    <h1>Hello</h1>
+    <p>@Html.ActionLink("Login", "Login", "Account")</p>
+}
+else
+{
+    <h1>Hello @User.FindFirst(ClaimTypes.Name).Value from @User.FindFirst(Constants.CompanyClaimType).Value</h1>
+    <p>@Html.ActionLink("Logout", "Logout", "Account")</p>
+}
+
+<h2>Music Library</h2>
+@foreach (var album in Model)
+{
+    <p>
+        @Html.ActionLink(album.Title, "Details", new { id = album.Id }) by @album.Artist.
+        &nbsp;|&nbsp;
+        @Html.ActionLink("Edit", "Edit", new { id = album.Id })
+        <br />
+        Published by @album.Publisher
+    </p>
+}

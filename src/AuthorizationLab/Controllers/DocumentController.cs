@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AuthorizationLab.Controllers
 {
@@ -27,7 +27,7 @@ namespace AuthorizationLab.Controllers
 
             if (document == null)
             {
-                return new HttpNotFoundResult();
+                return new NotFoundResult();
             }
 
             if (await _authorizationService.AuthorizeAsync(User, document, new EditRequirement()))
