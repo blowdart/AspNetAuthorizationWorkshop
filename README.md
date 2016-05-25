@@ -758,14 +758,15 @@ ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to 
 @inject IAuthorizationService AuthorizationService
 
 <h1>Document Library</h1>
-@foreach (var document in Model)
-{
-    <p>
-        @if (await AuthorizationService.AuthorizeAsync(User, document, new EditRequirement()))
+@{ 
+    var requirement = new EditRequirement();
+    foreach (var document in Model)
+    {
+        if (await AuthorizationService.AuthorizeAsync(User, document, requirement))
         {
-            @Html.ActionLink("Document #" + document.Id, "Edit", new { id = document.Id })
+        <p>@Html.ActionLink("Document #" + document.Id, "Edit", new { id = document.Id })</p>
         }
-    </p>
+    }
 }
 ```
 
