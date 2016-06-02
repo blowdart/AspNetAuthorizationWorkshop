@@ -39,7 +39,7 @@ namespace AuthorizationLab
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationScheme = "Cookie",
-                LoginPath = new PathString("/Account/Unauthorized/"),
+                LoginPath = new PathString("/Account/Login/"),
                 AccessDeniedPath = new PathString("/Account/Forbidden/"),
                 AutomaticAuthenticate = true,
                 AutomaticChallenge = true

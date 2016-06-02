@@ -74,14 +74,14 @@ Step 1: Setup authorization
 app.UseCookieAuthentication(new CookieAuthenticationOptions
 {
     AuthenticationScheme = "Cookie",
-    LoginPath = new PathString("/Account/Unauthorized/"),
+    LoginPath = new PathString("/Account/Login/"),
     AccessDeniedPath = new PathString("/Account/Forbidden/"),
     AutomaticAuthenticate = true,
     AutomaticChallenge = true
 });
 ```
 
-* Now create an `Account` controller, `AccountController.cs`. Create an `Unauthorized()` action and a `Forbidden()` action.
+* Now create an `Account` controller, `AccountController.cs`. Create an `Login()` action and a `Forbidden()` action.
 
 ```c#
 using Microsoft.AspNetCore.Mvc;
@@ -90,7 +90,7 @@ namespace AuthorizationLab.Controllers
 {
     public class AccountController : Controller
     {
-        public IActionResult Unauthorized()
+        public IActionResult Login()
         {
             return View();
         }
@@ -103,15 +103,15 @@ namespace AuthorizationLab.Controllers
 }
 ```
 
-* Create an `Account` folder under the `Views` folder and create corresponding views for the actions, `Unauthorized.cshtml` and `Forbidden.cshtml`. 
-* Add some text to each view so you can tell which view is being displayed, and run your project. You will see you end up at the Unauthorized view.
-* Return to the `Account` controller. Change the `Unauthorized` action to create a `principal` and persist it using the code below. This will create user information and put it inside a cookie. This fakes what would normally happen in a forms based login system.
+* Create an `Account` folder under the `Views` folder and create corresponding views for the actions, `Login.cshtml` and `Forbidden.cshtml`. 
+* Add some text to each view so you can tell which view is being displayed, and run your project. You will see you end up at the Login view.
+* Return to the `Account` controller. Change the `Login` action to create a `principal` and persist it using the code below. This will create user information and put it inside a cookie. This fakes what would normally happen in a forms based login system.
 
 ```c#
-public async Task<IActionResult> Unauthorized(string returnUrl = null)
+public async Task<IActionResult> Login(string returnUrl = null)
 {
     const string Issuer = "https://contoso.com";
-    List<Claim> claims = new List<Claim>();
+    var claims = new List<Claim>();
     claims.Add(new Claim(ClaimTypes.Name, "barry", ClaimValueTypes.String, Issuer));
     var userIdentity = new ClaimsIdentity("SuperSecureLogin");
     userIdentity.AddClaims(claims);
@@ -157,7 +157,7 @@ else
 }
 ```
 
-* Run the project and see what happens. You should see 'Hello barry'. The code `claims.Add(new Claim(ClaimTypes.Name, "barry", ClaimValueTypes.String, Issuer));` inside the `Unauthorized()` method in the account controller is what is setting the name claim, and is what is being displayed by the view.
+* Run the project and see what happens. You should see 'Hello barry'. The code `claims.Add(new Claim(ClaimTypes.Name, "barry", ClaimValueTypes.String, Issuer));` inside the `Login()` method in the account controller is what is setting the name claim, and is what is being displayed by the view.
 
 Step 2: Authorize all the things
 ================================
@@ -225,7 +225,7 @@ services.AddAuthorization(options =>
 });
 ```
 
-* Add a suitable claim to the identity issued by `Unauthorized` action in the `Account` Controller.
+* Add a suitable claim to the identity issued by `Login` action in the `Account` Controller.
 
 ```c#
 claims.Add(new Claim("EmployeeId", string.Empty, ClaimValueTypes.String, Issuer));
@@ -244,7 +244,7 @@ options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123
 ```
 
 * Run the app again and the empty claim will be rejected and you will end up at the Forbidden page. 
-* Change the identity issuing code to have a suitable claim value to the `Unauthorized` action, as shown below, and try again.
+* Change the identity issuing code to have a suitable claim value to the `Login` action, as shown below, and try again.
 
 ```c#
 claims.Add(new Claim("EmployeeId", "123", ClaimValueTypes.String, Issuer));
@@ -255,7 +255,7 @@ Step 5: Code Based Policies
 
 Code based policies consist of a requirement, implementing `IAuthorizationRequirement` and a handler for the requirement, implementing `AuthorizationHandler<T>` where T is the requirement.
 
-* Add a date of birth claim to the user principal in the `Unauthorized` action in the `Account` controller.
+* Add a date of birth claim to the user principal in the `Login` action in the `Account` controller.
 
 ```c#
 claims.Add(new Claim(ClaimTypes.DateOfBirth, "1970-06-08", ClaimValueTypes.Date));
@@ -405,7 +405,7 @@ namespace AuthorizationLab
 options.AddPolicy("BuildingEntry", policy => policy.Requirements.Add(new OfficeEntryRequirement()));
 ```
 
-* Go back to the `Account` controller's `Unauthorized` method and add a suitable badge ID claim.
+* Go back to the `Account` controller's `Login` method and add a suitable badge ID claim.
 
 ```c#
 claims.Add(new Claim("BadgeNumber", "123456", ClaimValueTypes.String, Issuer));

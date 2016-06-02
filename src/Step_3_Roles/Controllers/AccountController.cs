@@ -14,10 +14,10 @@ namespace AuthorizationLab.Controllers
     [AllowAnonymous]
     public class AccountController : Controller
     {
-        public async Task<IActionResult> Unauthorized(string returnUrl = null)
+        public async Task<IActionResult> Login(string returnUrl = null)
         {
             const string Issuer = "https://contoso.com";
-            List<Claim> claims = new List<Claim>();
+            var claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.Name, "barry", ClaimValueTypes.String, Issuer));
             claims.Add(new Claim(ClaimTypes.Role, "Administrator", ClaimValueTypes.String, Issuer));
             var userIdentity = new ClaimsIdentity("SuperSecureLogin");
