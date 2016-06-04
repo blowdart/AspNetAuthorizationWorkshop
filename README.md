@@ -6,7 +6,7 @@ This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.
 
 [Authorization Documentation](https://docs.asp.net/en/latest/security/authorization/index.html).
 
-*Tip: When you stop the app always close the browser to clear the identity cookie.*
+*Tip: When you stop finish running the app at each stage always close the browser to clear the identity cookie.*
 
 Step 0: Preparation
 ===================
@@ -17,6 +17,7 @@ Create a new, blank, ASP.NET project.
 * File > New Project > .NET Core 
 * Select ASP.NET Core Web Application (.NET Core)
 * Select the Empty Template
+* Call your solution `AuthorizationLab` if you want to cut and paste the sample code contained in this document.
 
 Add MVC to the app. 
 -------------------
@@ -311,7 +312,7 @@ options.AddPolicy("Over21Only", policy => policy.Requirements.Add(new MinimumAge
 
 * Apply it to the `Home` controller using the `Authorize` attribute.
 * Run the app and ensure you can see the home page.
-* Experiment with the date of birth value to make authorization fail. Don't forget to set it back to a passing value before you move on.
+* Experiment with the date of birth value (for example, make the year last year) to make authorization fail. Don't forget to set it back to a passing value before you move on.
 
 Step 6: Multiple handlers for a requirement
 ===========================================
@@ -734,7 +735,7 @@ ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to 
 * Add an @using statement for `Microsoft.AspNet.Authorization` and inject the `AuthorizationService` using the `@inject` command
 
 ```
-@using Microsoft.AspNet.Authorization
+@using Microsoft.AspNetCore.Authorization
 @using AuthorizationLab
 @model IEnumerable<Document>
 @inject IAuthorizationService AuthorizationService
@@ -793,4 +794,4 @@ Change the site to include the following functionality
 4. Make the Edit functionality only available to Administrators for the company that has issued the album.
 5. Change the `Index` action in the `HomeController` so it only lists all albums and but the edit link is only shown for administrators for the company that issued the album.
 
-A sample solution is containing in the `Workshop_Suggested_Solution` folder.
+A sample solution is contained in the `Workshop_Suggested_Solution` folder.
