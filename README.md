@@ -57,7 +57,7 @@ namespace AuthorizationLab.Controllers
 
 * Create a `Views` folder.
 * Create a `Home` folder under the `Views`.
-* Create an `Index.cshtml` file inside the `Home\Views` folder, and edit it to say Hello World.
+* Create an `Index.cshtml` file inside the `Views\Home` folder, and edit it to say Hello World.
 * Run your application and ensure you see Hello World.
 
 Step 1: Setup authorization
