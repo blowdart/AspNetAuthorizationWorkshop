@@ -22,7 +22,7 @@ Create a new, blank, ASP.NET project.
 Add MVC to the app. 
 -------------------
 
-* Right click on the project, choose `Manage NuGet Packages`, click Browse, search for `Microsoft.AspNetCore.Mvc` and install v1.0.0-rc2-final
+* Right click on the project, choose `Manage NuGet Packages`, ensure the `Include prerelease` box is checked then click Browse, search for `Microsoft.AspNetCore.Mvc` and install v1.0.0-rc2-final. 
 * Edit `Startup.cs`  and add `services.AddMvc();` to the top of the `ConfigureServices()` method;
 * Edit the `Configure()` method, delete the existing code.
 * In the now empty `Configure();` add the following code to setup MVC default routing;
@@ -237,7 +237,7 @@ claims.Add(new Claim("EmployeeId", string.Empty, ClaimValueTypes.String, Issuer)
 ```
 
 * Run the app and ensure you can see the home page.
-* This is a rather useless check though. Claims are made up of a claim name and a claim values. You really want to check the values and not just the presence of a claim. Luckily there’s a parameter for that. Change the EmployeeId policy to require one of a number of values;
+* This is a rather useless check though. Claims are made up of a claim name and a claim values. You really want to check the values and not just the presence of a claim. Luckily thereÂ’s a parameter for that. Change the EmployeeId policy to require one of a number of values;
 
 ```c#
 options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123", "456"));
@@ -438,7 +438,7 @@ claims.Add(new Claim("TemporaryBadgeExpiry",
 	                 Issuer));
 ```
 
-* Run the app, and you’re still authorized because now the handler for temporary badges fufills the building entry requirement.
+* Run the app, and youÂ’re still authorized because now the handler for temporary badges fufills the building entry requirement.
 * Change the temporary badge claim so it has expired; 
 
 ```c#
@@ -448,13 +448,13 @@ claims.Add(new Claim("TemporaryBadgeExpiry",
 	                 Issuer));
 ```
 
-* Rerun the app and you’ll see you’re forbidden.
+* Rerun the app and youÂ’ll see youÂ’re forbidden.
 * Remove the temporary badge claim and uncomment the badgenumber claim code, so you're back to being authorized.
 
 Step 7: Resource Based Requirements
 ===================================
 
-So far we’ve covered requirements that are based only on a user’s identity. However often authorization requires the resource being accessed. For example a Document class may have an author and only authors can edit the document, whilst others can view it.
+So far weÂ’ve covered requirements that are based only on a userÂ’s identity. However often authorization requires the resource being accessed. For example a Document class may have an author and only authors can edit the document, whilst others can view it.
 
 * Create a resource class, `Document` with an int ID property and a string Author property.
 
@@ -584,7 +584,7 @@ namespace AuthorizationLab.Controllers
 
 * Run the app and load the /Document URL. Ensure you see a list of documents and you can click into each one.
 
-Now we need to define operations to authorize against. For a document this might be Read, Write, Edit and Delete. We provide a base class, OperationAuthorizationRequirement which you can use as a starting point, but it’s optional.
+Now we need to define operations to authorize against. For a document this might be Read, Write, Edit and Delete. We provide a base class, OperationAuthorizationRequirement which you can use as a starting point, but itÂ’s optional.
 
 * Define an requirement for editing, `EditRequirement.cs`
 
@@ -630,7 +630,7 @@ namespace AuthorizationLab
 services.AddSingleton<IAuthorizationHandler, DocumentEditHandler>();
 ```
 
-We cannot use resource handlers in attributes, because binding hasn’t happened at that point and we need the resource. The resource only becomes available inside the action method. So we must call the authorization service directly.
+We cannot use resource handlers in attributes, because binding hasnÂ’t happened at that point and we need the resource. The resource only becomes available inside the action method. So we must call the authorization service directly.
 
 * Return to the Document controller and edit the constructor to include IAuthorizationService as one of its parameters and store it in a local variable.
 
@@ -728,7 +728,7 @@ Step 8: Authorizing in Views
 ============================
 
 For resource links and other UI elements you probably want to not show those links to users in the UI, so as to reduce temptation. 
-You still want to keep authorization checks in the Controller – never rely solely on UI element removal as a security mechanism. 
+You still want to keep authorization checks in the Controller Â– never rely solely on UI element removal as a security mechanism. 
 ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to hide documents in the document list the current user cannot access.
 
 * Open the Index view file, `index.cshtml` in the `Documents` folder. 
