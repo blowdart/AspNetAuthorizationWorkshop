@@ -22,7 +22,7 @@ Create a new, blank, ASP.NET project.
 Add MVC to the app. 
 -------------------
 
-* Right click on the project, choose `Manage NuGet Packages`, click Browse, search for `Microsoft.AspNetCore.Mvc` and install v1.0.0-rc2-final
+* Right click on the project, choose `Manage NuGet Packages`,click Browse, search for `Microsoft.AspNetCore.Mvc`, check the `Include prerelease` box, and install v1.0.0-rc2-final
 * Edit `Startup.cs`  and add `services.AddMvc();` to the top of the `ConfigureServices()` method;
 * Edit the `Configure()` method, delete the existing code.
 * In the now empty `Configure();` add the following code to setup MVC default routing;
