@@ -64,7 +64,7 @@ Step 1: Setup authorization
 ===========================
 
 * Add the `Microsoft.AspNetCore.Authorization` nuget package.
-* Add the `Microsoft.AspNetCore.Authentication.Cookies nuget` package
+* Add the `Microsoft.AspNetCore.Authentication.Cookies` nuget package
 * Add `services.AddAuthorization()` at the top of the `ConfigureServices()` method.
 * Edit the Home controller and add the `[Authorize]` attribute to the controller.
 * Run the project and panic. You get a blank page. Open the IE Dev Tools, click Network then refresh the browser. You will see you are getting a 401 returned. The server is telling you that you are unauthorized.
@@ -163,7 +163,7 @@ Step 2: Authorize all the things
 ================================
 
 * First remove the `Authorize` attribute from the `Home` controller.
-* Change the `AddMvc()` call in `ConfigureServices()` in `startup.cs` to add a default authorization policy to the MVC configuration
+* Change the `AddMvc()` call in `ConfigureServices()` in `Startup.cs` to add a default authorization policy to the MVC configuration.
 
 ```c#
 services.AddMvc(config =>
@@ -188,7 +188,7 @@ Step 3: Roles
 ```
 
 * Run the application and confirm you are redirected to the `Forbidden` view. This happens because you have an identity, but it's not part of the Administrator role.
-* Return to the `AccountController` and second `claims.Add()` line, as shown below. This a Role claim with the value of Administrator to the issued identity.
+* Return to the `AccountController` and add a second `claims.Add()` line, as shown below. This adds a Role claim with the value of Administrator to the issued identity.
 
 ```c#
 claims.Add(new Claim(ClaimTypes.Role, "Administrator", ClaimValueTypes.String, Issuer));
@@ -198,8 +198,8 @@ claims.Add(new Claim(ClaimTypes.Role, "Administrator", ClaimValueTypes.String, I
 
 Step 4: Simple Policies
 =======================
-* Return to startup.cs and locate the `services.AddAuthorization()` in `ConfigureServices()` call.
-* Add a policy to the configuration 
+* Return to `Startup.cs` and locate the `services.AddAuthorization()` in `ConfigureServices()` call.
+* Add a policy to the configuration.
 
 ```c#
 services.AddAuthorization(options =>
@@ -237,7 +237,7 @@ claims.Add(new Claim("EmployeeId", string.Empty, ClaimValueTypes.String, Issuer)
 ```
 
 * Run the app and ensure you can see the home page.
-* This is a rather useless check though. Claims are made up of a claim name and a claim values. You really want to check the values and not just the presence of a claim. Luckily there's a parameter for that. Change the EmployeeId policy to require one of a number of values;
+* This is a rather useless check, though. Claims are made up of a claim name and a claim values. You really want to check the values and not just the presence of a claim. Luckily there's a parameter for that. Change the `EmployeeId` policy to require one of a number of values;
 
 ```c#
 options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123", "456"));
@@ -323,7 +323,7 @@ open with your Microsoft badge, however on days you forget your badge you can go
 reception and get a temporary pass and the receptionist will let you through the gates. Thus there are two ways to fufill the single entry requirement.
 In the ASP.NET Core authorization model this would be implemented as two handlers for a single requirement.
 
-* First, write a new `IAuthorizationRequirement`, `OfficeEntryRequirement`
+* First, write a new `IAuthorizationRequirement`, `OfficeEntryRequirement`.
 
 ```c#
 using Microsoft.AspNetCore.Authorization;
@@ -337,7 +337,7 @@ namespace AuthorizationLab
 ```
 
 * Now write an `AuthorizationHandler` that checks if the current identity has a badge number claim, 
-issued by the employer, `HasBadgeHandler`
+issued by the employer, `HasBadgeHandler`.
 
 ```c#
 using Microsoft.AspNetCore.Authorization;
@@ -399,7 +399,7 @@ namespace AuthorizationLab
 }
 ```
 
-* Next create a policy for the requirement, registering it in the `ConfigureServices()` in `startup.cs`, inside the authorization configuration
+* Next create a policy for the requirement, registering it in the `ConfigureServices()` in `Startup.cs`, inside the authorization configuration.
 
 ```c#
 options.AddPolicy("BuildingEntry", policy => policy.Requirements.Add(new OfficeEntryRequirement()));
@@ -421,7 +421,7 @@ claims.Add(new Claim("BadgeNumber", "123456", ClaimValueTypes.String, Issuer));
 
 Handlers are held in the ASP.NET DI container. In our previous sample we combined the requirement and the handler in one class, so the authorization system knew about it without having to manually register it in DI. Now we have separate handlers we need to register them in the DI container before they can be found.
 
-* Open `startup.cs`, and inside `ConfigureServices()` register the handlers in the DI container by adding the following to the bottom of the `ConfigureServices()` method. Note that they don't have to be singletons, you can use the DI system to inject constructor parameters into handlers, so, for example, if you're injecting an EF repository you may want to add your handler as scoped to a request.
+* Open `Startup.cs`, and inside `ConfigureServices()` register the handlers in the DI container by adding the following to the bottom of the `ConfigureServices()` method. Note that they don't have to be singletons, you can use the DI system to inject constructor parameters into handlers, so, for example, if you're injecting an EF repository you may want to add your handler as scoped to a request.
 
 ```c#
 services.AddSingleton<IAuthorizationHandler, HasBadgeHandler>();
@@ -449,7 +449,7 @@ claims.Add(new Claim("TemporaryBadgeExpiry",
 ```
 
 * Rerun the app and you'll see you're forbidden.
-* Remove the temporary badge claim and uncomment the badgenumber claim code, so you're back to being authorized.
+* Remove the temporary badge claim and uncomment the BadgeNumber claim code, so you're back to being authorized.
 
 Step 7: Resource Based Requirements
 ===================================
@@ -513,7 +513,7 @@ namespace AuthorizationLab
 }
 ```
 
-* Finally register the document repository in the services collection through the `ConfigureServices()` method in `startup.cs`
+* Finally register the document repository in the services collection through the `ConfigureServices()` method in `Startup.cs`
 
 ```c#
 services.AddSingleton<IDocumentRepository, DocumentRepository>();
@@ -521,7 +521,7 @@ services.AddSingleton<IDocumentRepository, DocumentRepository>();
 
 Now we can create a suitable controller and views to display a list of documents and the document itself.
 
-* First create a Document controller in the Controllers folder, DocumentController.cs
+* First create a Document controller in the Controllers folder, `DocumentController.cs`.
 
 ```c#
 using Microsoft.AspNetCore.Mvc;
@@ -557,7 +557,7 @@ namespace AuthorizationLab.Controllers
 }
 ```
 
-* Create an `Document` folder underneath the `Views` folder and create and Index view, `index.cshtml`
+* Create an `Document` folder underneath the `Views` folder and create and Index view, `Index.cshtml`
 
 ```
 @using AuthorizationLab
@@ -572,7 +572,7 @@ namespace AuthorizationLab.Controllers
 }
 ```
 
-* Create an Edit view in the Document view folder, Edit.cshtml
+* Create an Edit view in the Document view folder, `Edit.cshtml`
 
 ```
 @using AuthorizationLab
@@ -731,7 +731,7 @@ For resource links and other UI elements you probably want to not show those lin
 You still want to keep authorization checks in the Controller - never rely solely on UI element removal as a security mechanism. 
 ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to hide documents in the document list the current user cannot access.
 
-* Open the Index view file, `index.cshtml` in the `Documents` folder. 
+* Open the Index view file, `Index.cshtml` in the `Documents` folder. 
 * Add an @using statement for `Microsoft.AspNet.Authorization` and inject the `AuthorizationService` using the `@inject` command
 
 ```
@@ -786,7 +786,7 @@ A User repository has been provided for you and is injected into the `Account` c
 
 The cookie authentication middleware is already configured, the scheme name is available from the `Constants.MiddlewareScheme` field.
 
-Change the site to include the following functionality
+Change the site to include the following functionality:
 
 1. Change the `AccountController` `Login` action to create a cookie for the user logging in using the already configured cookie middleware.
 2. Make the entire site require a login, excluding the `Login` action in the `AccountController`.
