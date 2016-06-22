@@ -244,7 +244,7 @@ options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123
 ```
 
 * Run the app again and the empty claim will be rejected and you will end up at the Forbidden page. 
-* Change the identity issuing code to have a suitable claim value to the `Login` action, as shown below, and try again.
+* Change the identity issuing code to have a suitable claim value to the `Login` action, as shown below, and try again. Make sure to clear your old cookie, as the call will still fail based on the old cookie.
 
 ```c#
 claims.Add(new Claim("EmployeeId", "123", ClaimValueTypes.String, Issuer));
