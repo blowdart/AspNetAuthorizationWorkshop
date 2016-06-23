@@ -152,12 +152,15 @@ private IActionResult RedirectToLocal(string returnUrl)
 }
 else
 {
-    <h1>Hello @User.Identities.First(u => u.IsAuthenticated && 
-                                     u.HasClaim(c => c.Type == ClaimTypes.Name)).FindFirst(ClaimTypes.Name).Value</h1>
+    <h1>Hello @User.Identities.First(
+      u => u.IsAuthenticated && 
+      u.HasClaim(c => c.Type == ClaimTypes.Name)).FindFirst(ClaimTypes.Name).Value</h1>
 }
 ```
 
 * Run the project and see what happens. You should see 'Hello barry'. The code `claims.Add(new Claim(ClaimTypes.Name, "barry", ClaimValueTypes.String, Issuer));` inside the `Login()` method in the account controller is what is setting the name claim, and is what is being displayed by the view.
+
+*Remember to close the browser to clear the identity cookie before moving on to the next step.*
 
 Step 2: Authorize all the things
 ================================
@@ -178,6 +181,8 @@ services.AddMvc(config =>
 * Run and watch everything blow up into an infinite redirect loop. Why? You've made every page require authentication. This even includes the login pages. 
 * Now add the `[AllowAnonymous]` attribute to the `Account` controller, run again and see the user is logged in. `AllowAnonymous` allows you to mark a controller or an action method as not requiring authentication, even if you require authentication elsewhere.
 
+*Remember to close the browser to clear the identity cookie before moving on to the next step.*
+
 Step 3: Roles
 =============
 
@@ -188,6 +193,7 @@ Step 3: Roles
 ```
 
 * Run the application and confirm you are redirected to the `Forbidden` view. This happens because you have an identity, but it's not part of the Administrator role.
+* Close the browser to clear the identity cookie.
 * Return to the `AccountController` and add a second `claims.Add()` line, as shown below. This adds a Role claim with the value of Administrator to the issued identity.
 
 ```c#
@@ -195,6 +201,8 @@ claims.Add(new Claim(ClaimTypes.Role, "Administrator", ClaimValueTypes.String, I
 ```
 
 * Run the application and confirm you are logged in.
+
+*Remember to close the browser to clear the identity cookie before moving on to the next step.*
 
 Step 4: Simple Policies
 =======================
@@ -215,6 +223,7 @@ services.AddAuthorization(options =>
 ```
 
 * Run the app and confirm you still see the home page. All that has changed is how you're specifing your requirements. Instead of embedding the role name in the attribute you've written a policy which specifies the role name.
+* Close your browser to clear your identity cookie.
 * Now add a second policy, this time requiring a claim.
 
 ```c#
@@ -244,11 +253,14 @@ options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123
 ```
 
 * Run the app again and the empty claim will be rejected and you will end up at the Forbidden page. 
+* Close your browser to clear the identity cookie.
 * Change the identity issuing code to have a suitable claim value to the `Login` action, as shown below, and try again.
 
 ```c#
 claims.Add(new Claim("EmployeeId", "123", ClaimValueTypes.String, Issuer));
 ```
+
+*Remember to close the browser to clear the identity cookie before moving on to the next step.*
 
 Step 5: Code Based Policies
 ===========================
@@ -313,6 +325,8 @@ options.AddPolicy("Over21Only", policy => policy.Requirements.Add(new MinimumAge
 * Apply it to the `Home` controller using the `Authorize` attribute.
 * Run the app and ensure you can see the home page.
 * Experiment with the date of birth value (for example, make the year last year) to make authorization fail. Don't forget to set it back to a passing value before you move on.
+
+*Remember to close the browser to clear the identity cookie before moving on to the next step.*
 
 Step 6: Multiple handlers for a requirement
 ===========================================
@@ -429,7 +443,7 @@ services.AddSingleton<IAuthorizationHandler, HasTemporaryPassHandler>();
 ```
 
 * Run the app again and you can see authorization works. 
-* Experiment with commenting out the BadgeNumber claim and replacing it with a TemporaryBadgeExpiry claim
+* Experiment with commenting out the BadgeNumber claim and replacing it with a TemporaryBadgeExpiry claim, remembering to close the browser each time to clear the identity cookie so it will be recreated with your new claims.
 
 ```c#
 claims.Add(new Claim("TemporaryBadgeExpiry", 
@@ -439,7 +453,7 @@ claims.Add(new Claim("TemporaryBadgeExpiry",
 ```
 
 * Run the app, and you're still authorized because now the handler for temporary badges fufills the building entry requirement.
-* Change the temporary badge claim so it has expired; 
+* Change the temporary badge claim so it has expired; remembering to close the browser to clear the identity cookie before running your new code.
 
 ```c#
 claims.Add(new Claim("TemporaryBadgeExpiry", 
@@ -449,14 +463,14 @@ claims.Add(new Claim("TemporaryBadgeExpiry",
 ```
 
 * Rerun the app and you'll see you're forbidden.
-* Remove the temporary badge claim and uncomment the BadgeNumber claim code, so you're back to being authorized.
+* Remove the temporary badge claim and uncomment the BadgeNumber claim code, so you're back to being authorized, close your browser to clear the identity cookie and rerun the app to make sure you are no longer forbidden.
 
 Step 7: Resource Based Requirements
 ===================================
 
 So far we've covered requirements that are based only on a user's identity. However often authorization requires the resource being accessed. For example a Document class may have an author and only authors can edit the document, whilst others can view it.
 
-* Create a resource class, `Document` with an int ID property and a string Author property.
+* Create a resource class, `Document` with an `int` ID property and a `string` Author property.
 
 ```c#
 namespace AuthorizationLab
@@ -582,7 +596,7 @@ namespace AuthorizationLab.Controllers
 <h2>Author: @Model.Author</h2>
 ```
 
-* Run the app and load the /Document URL. Ensure you see a list of documents and you can click into each one.
+* Run the app and load the `/Document` URL. Ensure you see a list of documents and you can click into each one.
 
 Now we need to define operations to authorize against. For a document this might be Read, Write, Edit and Delete. We provide a base class, OperationAuthorizationRequirement which you can use as a starting point, but it's optional.
 
