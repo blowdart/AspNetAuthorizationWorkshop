@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 
 using AuthorizationWorkshop.Models;
+using System.Threading.Tasks;
 
 namespace AuthorizationWorkshop
 {
@@ -14,12 +15,14 @@ namespace AuthorizationWorkshop
             _logger = logger;
         }
 
-        protected override void Handle(AuthorizationContext context, AlbumOwnerRequirement requirement, Album resource)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, AlbumOwnerRequirement requirement, Album resource)
         {
             if (resource.Publisher == context.User.FindFirst(Constants.CompanyClaimType).Value)
             {
                 context.Succeed(requirement);
             }
+
+            return Task.FromResult(0);
         }
     }
 }

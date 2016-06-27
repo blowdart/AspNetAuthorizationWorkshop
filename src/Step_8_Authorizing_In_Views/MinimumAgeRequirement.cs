@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace AuthorizationLab
 {
@@ -13,11 +14,11 @@ namespace AuthorizationLab
             _minimumAge = minimumAge;
         }
 
-        protected override void Handle(AuthorizationContext context, MinimumAgeRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, MinimumAgeRequirement requirement)
         {
             if (!context.User.HasClaim(c => c.Type == ClaimTypes.DateOfBirth))
             {
-                return;
+                return Task.FromResult(0);
             }
 
             var dateOfBirth = Convert.ToDateTime(
@@ -33,6 +34,8 @@ namespace AuthorizationLab
             {
                 context.Succeed(requirement);
             }
+
+            return Task.FromResult(0);
         }
     }
 }

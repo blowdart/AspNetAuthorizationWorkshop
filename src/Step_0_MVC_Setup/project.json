@@ -1,18 +1,18 @@
 {
   "dependencies": {
     "Microsoft.NETCore.App": {
-      "version": "1.0.0-rc2-3002702",
+      "version": "1.0.0",
       "type": "platform"
     },
-    "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0-rc2-final",
-    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-rc2-final",
-    "Microsoft.AspNetCore.Mvc": "1.0.0-rc2-final"
+    "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0",
+    "Microsoft.AspNetCore.Mvc": "1.0.0"
   },
 
   "tools": {
+    "Microsoft.AspNetCore.Razor.Tools": "1.0.0-preview2-final",
     "Microsoft.AspNetCore.Server.IISIntegration.Tools": {
-      "version": "1.0.0-preview1-final",
-      "imports": "portable-net45+win8+dnxcore50"
+      "version": "1.0.0-preview2-final"
     }
   },
 
@@ -20,7 +20,6 @@
     "netcoreapp1.0": {
       "imports": [
         "dotnet5.6",
-        "dnxcore50",
         "portable-net45+win8"
       ]
     }
@@ -38,6 +37,9 @@
   "publishOptions": {
     "include": [
       "wwwroot",
+      "Views",
+      "Areas/**/Views",
+      "appsettings.json",
       "web.config"
     ]
   },

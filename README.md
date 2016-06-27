@@ -1,8 +1,6 @@
 # ASP.NET Core Authorization Lab
 
-This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core RC2.
-
-(There's a bug in RC2 which means you can't have projects with spaces in their name - hence this being a start again, rather than just a PR with porting DIFFs.)
+This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core RTM.
 
 [Authorization Documentation](https://docs.asp.net/en/latest/security/authorization/index.html).
 
@@ -22,7 +20,7 @@ Create a new, blank, ASP.NET project.
 Add MVC to the app. 
 -------------------
 
-* Right click on the project, choose `Manage NuGet Packages`, ensure the `Include prerelease` box is checked then click Browse, search for `Microsoft.AspNetCore.Mvc` and install v1.0.0-rc2-final. 
+* Right click on the project, choose `Manage NuGet Packages`, search for `Microsoft.AspNetCore.Mvc` and install v1.0.0. 
 * Edit `Startup.cs`  and add `services.AddMvc();` to the top of the `ConfigureServices()` method;
 * Edit the `Configure()` method, delete the existing code.
 * In the now empty `Configure();` add the following code to setup MVC default routing;
@@ -260,6 +258,8 @@ options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123
 claims.Add(new Claim("EmployeeId", "123", ClaimValueTypes.String, Issuer));
 ```
 
+If a policy has multiple claims all claims must be fufilled for authorization to succeed.
+
 *Remember to close the browser to clear the identity cookie before moving on to the next step.*
 
 Step 5: Code Based Policies
@@ -291,11 +291,13 @@ namespace AuthorizationLab
             _minimumAge = minimumAge;
         }
 
-        protected override void Handle(AuthorizationContext context, MinimumAgeRequirement requirement)
+        protected override Task HandleRequirementAsync(
+		    AuthorizationHandlerContext context, 
+			MinimumAgeRequirement requirement)
         {
             if (!context.User.HasClaim(c => c.Type == ClaimTypes.DateOfBirth))
             {
-                return;
+                return Task.FromResult(0);
             }
 
             var dateOfBirth = Convert.ToDateTime(
@@ -311,6 +313,8 @@ namespace AuthorizationLab
             {
                 context.Succeed(requirement);
             }
+
+			return Task.FromResult(0);
         }
     }
 }
@@ -331,10 +335,16 @@ options.AddPolicy("Over21Only", policy => policy.Requirements.Add(new MinimumAge
 Step 6: Multiple handlers for a requirement
 ===========================================
 
+You may have noticed what a handler returns, nothing at all (Strictly we're returning `Task.FromResult(0);`, which is effectively nothing). 
+Handlers inform the authorization service they have succeeded by calling `context.Succeed(requirement);`. 
+You may be asking yourself if there is a `context.Succeed()` is there a `context.Fail()`? There is, but if your requirement isn't met you
+shouldn't touch the context at all. Now you may be asking why not? Well ...
+
 Sometimes you may want multiple handlers for an Authorization Requirement, 
 for example when there are multiple ways to fulfill a requirement. Microsoft's office doors 
 open with your Microsoft badge, however on days you forget your badge you can go to 
-reception and get a temporary pass and the receptionist will let you through the gates. Thus there are two ways to fufill the single entry requirement.
+reception and get a temporary pass and the receptionist will let you through the gates. 
+Thus there are two ways to fufill the single entry requirement.
 In the ASP.NET Core authorization model this would be implemented as two handlers for a single requirement.
 
 * First, write a new `IAuthorizationRequirement`, `OfficeEntryRequirement`.
@@ -360,26 +370,32 @@ namespace AuthorizationLab
 {
     public class HasBadgeHandler : AuthorizationHandler<OfficeEntryRequirement>
     {
-        protected override void Handle(AuthorizationContext context, OfficeEntryRequirement requirement)
+        protected override Task HandleRequirementAsync(
+		  AuthorizationHandlerContext context, 
+		  OfficeEntryRequirement requirement)
         {
             if (!context.User.HasClaim(c => c.Type == "BadgeNumber" && 
                                             c.Issuer == "https://contoso.com"))
             {
-                return;
+                return Task.FromResult(0);
             }
 
             context.Succeed(requirement);
+
+			return Task.FromResult(0);
         }
     }
 }
 ```
 
 That takes care of people who remembered their badges, issued by the right company (after all multiple companies have entry cards,
-so you want to check that the card is issued by the company you expect. The Claims class has an issuer property which details who
-issued the claim, so in our case it's who issued the badge). But what about those who forget and have 
+so you want to check that the card is issued by the company you expect. The `Claims` class has an issuer property which details who
+issued the claim, so in our case it's who issued the badge). 
+
+But what about those who forget and have 
 a temporary badge? You could just put it all in one handler, but handlers and requirements are 
 meant to be reusable. You could use the `HasBadgeHandler` shown above for other things, not just office entry 
-(for example our code signing infrastructure needs the smartcard that is our badge to trigger jobs).
+(for example the Microsoft code signing infrastructure needs the smartcard that is our office badge to trigger jobs).
 
 * To cope with temporary badges write another `AuthorizationHandler`, `HasTemporaryPassHandler`
 
@@ -391,7 +407,9 @@ namespace AuthorizationLab
 {
     public class HasTemporaryPassHandler : AuthorizationHandler<OfficeEntryRequirement>
     {
-        protected override void Handle(AuthorizationContext context, OfficeEntryRequirement requirement)
+        protected override void HandleRequirementAsync(
+		  AuthorizationHandlerContext context, 
+		  OfficeEntryRequirement requirement)
         {
             if (!context.User.HasClaim(c => c.Type == "TemporaryBadgeExpiry" &&
                                             c.Issuer == "https://contoso.com"))
@@ -408,10 +426,17 @@ namespace AuthorizationLab
             {
                 context.Succeed(requirement);
             }
+
+			return Task.FromResult(0);
         }
     }
 }
 ```
+
+Note that neither handler calls context.Fail(). 
+context.Fail() is there for occassions when authorization cannot continue, even if there's another handler,
+for example, "My Entire User Database is on fire." or "The user I'm looking at has just been blocked, but other back-end systems 
+may not yet be updated."
 
 * Next create a policy for the requirement, registering it in the `ConfigureServices()` in `Startup.cs`, inside the authorization configuration.
 
@@ -625,14 +650,17 @@ namespace AuthorizationLab
 {
     public class DocumentEditHandler : AuthorizationHandler<EditRequirement, Document>
     {
-        protected override void Handle(AuthorizationContext context, 
-                                       EditRequirement requirement, 
-                                       Document resource)
+        protected override void HandleRequirementAsync(
+			AuthorizationHandlerContext context, 
+			EditRequirement requirement, 
+            Document resource)
         {
             if (resource.Author == context.User.FindFirst(ClaimTypes.Name).Value)
             {
                 context.Succeed(requirement);
             }
+
+			return Task.FromResult(0);
         }
     }
 }
@@ -787,8 +815,8 @@ ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to 
 
 * Run the app and browse to the Document URL, and you will see that you now only have a link to Document #1. You can still manually attempt to access document #2, but because you've kept the controller checks as well you won't get access.
 
-Applying what you've learned
-============================
+Applying what you've learnt
+===========================
 
 Open the `Workshop_Start` folder. 
 	
