@@ -774,7 +774,7 @@ You still want to keep authorization checks in the Controller - never rely solel
 ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to hide documents in the document list the current user cannot access.
 
 * Open the Index view file, `Index.cshtml` in the `Documents` folder. 
-* Add an @using statement for `Microsoft.AspNet.Authorization` and inject the `AuthorizationService` using the `@inject` command
+* Add an @using statement for `Microsoft.AspNetCore.Authorization` and inject the `AuthorizationService` using the `@inject` command
 
 ```
 @using Microsoft.AspNetCore.Authorization
