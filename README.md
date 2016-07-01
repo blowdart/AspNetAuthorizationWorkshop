@@ -407,14 +407,14 @@ namespace AuthorizationLab
 {
     public class HasTemporaryPassHandler : AuthorizationHandler<OfficeEntryRequirement>
     {
-        protected override void HandleRequirementAsync(
+        protected override Task HandleRequirementAsync(
 		  AuthorizationHandlerContext context, 
 		  OfficeEntryRequirement requirement)
         {
             if (!context.User.HasClaim(c => c.Type == "TemporaryBadgeExpiry" &&
                                             c.Issuer == "https://contoso.com"))
             {
-                return;
+                return Task.FromResult(0);
             }
 
             var temporaryBadgeExpiry = 
@@ -650,7 +650,7 @@ namespace AuthorizationLab
 {
     public class DocumentEditHandler : AuthorizationHandler<EditRequirement, Document>
     {
-        protected override void HandleRequirementAsync(
+        protected override Task HandleRequirementAsync(
 			AuthorizationHandlerContext context, 
 			EditRequirement requirement, 
             Document resource)
@@ -774,7 +774,7 @@ You still want to keep authorization checks in the Controller - never rely solel
 ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to hide documents in the document list the current user cannot access.
 
 * Open the Index view file, `Index.cshtml` in the `Documents` folder. 
-* Add an @using statement for `Microsoft.AspNet.Authorization` and inject the `AuthorizationService` using the `@inject` command
+* Add an @using statement for `Microsoft.AspNetCore.Authorization` and inject the `AuthorizationService` using the `@inject` command
 
 ```
 @using Microsoft.AspNetCore.Authorization
