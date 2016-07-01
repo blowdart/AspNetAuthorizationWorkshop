@@ -650,7 +650,7 @@ namespace AuthorizationLab
 {
     public class DocumentEditHandler : AuthorizationHandler<EditRequirement, Document>
     {
-        protected override void HandleRequirementAsync(
+        protected override Task HandleRequirementAsync(
 			AuthorizationHandlerContext context, 
 			EditRequirement requirement, 
             Document resource)
