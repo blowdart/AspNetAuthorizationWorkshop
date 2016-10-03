@@ -19,7 +19,7 @@ namespace AuthorizationLab
         {
             if (!context.User.HasClaim(c => c.Type == ClaimTypes.DateOfBirth))
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             var dateOfBirth = Convert.ToDateTime(context.User.FindFirst(c => c.Type == ClaimTypes.DateOfBirth).Value);
@@ -35,7 +35,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }

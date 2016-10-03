@@ -6,18 +6,18 @@ namespace AuthorizationLab
     public class HasBadgeHandler : AuthorizationHandler<OfficeEntryRequirement>
     {
         protected override Task HandleRequirementAsync(
-            AuthorizationHandlerContext context, 
+            AuthorizationHandlerContext context,
             OfficeEntryRequirement requirement)
         {
             if (!context.User.HasClaim(c => c.Type == "BadgeNumber" &&
                                             c.Issuer == "https://contoso.com"))
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             context.Succeed(requirement);
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }

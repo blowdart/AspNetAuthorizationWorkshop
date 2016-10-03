@@ -10,11 +10,11 @@ namespace AuthorizationLab
             if (!context.User.HasClaim(c => c.Type == "BadgeNumber" &&
                                             c.Issuer == "https://contoso.com"))
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             context.Succeed(requirement);
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }

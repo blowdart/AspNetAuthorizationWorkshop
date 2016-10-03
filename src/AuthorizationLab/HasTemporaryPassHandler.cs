@@ -12,10 +12,10 @@ namespace AuthorizationLab
             if (!context.User.HasClaim(c => c.Type == "TemporaryBadgeExpiry" &&
                                             c.Issuer == "https://contoso.com"))
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
-            var temporaryBadgeExpiry = 
+            var temporaryBadgeExpiry =
                 Convert.ToDateTime(context.User.FindFirst(
                                        c => c.Type == "TemporaryBadgeExpiry" &&
                                        c.Issuer == "https://contoso.com").Value);
@@ -25,7 +25,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }

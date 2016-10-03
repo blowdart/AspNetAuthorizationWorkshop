@@ -7,13 +7,13 @@ namespace AuthorizationLab
     public class HasTemporaryPassHandler : AuthorizationHandler<OfficeEntryRequirement>
     {
         protected override Task HandleRequirementAsync(
-            AuthorizationHandlerContext context, 
+            AuthorizationHandlerContext context,
             OfficeEntryRequirement requirement)
         {
             if (!context.User.HasClaim(c => c.Type == "TemporaryBadgeExpiry" &&
                                             c.Issuer == "https://contoso.com"))
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             var temporaryBadgeExpiry =
@@ -26,7 +26,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
     }
 }

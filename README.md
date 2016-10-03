@@ -297,7 +297,7 @@ namespace AuthorizationLab
         {
             if (!context.User.HasClaim(c => c.Type == ClaimTypes.DateOfBirth))
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             var dateOfBirth = Convert.ToDateTime(
@@ -314,7 +314,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-			return Task.FromResult(0);
+			return Task.CompletedTask;
         }
     }
 }
@@ -335,7 +335,7 @@ options.AddPolicy("Over21Only", policy => policy.Requirements.Add(new MinimumAge
 Step 6: Multiple handlers for a requirement
 ===========================================
 
-You may have noticed what a handler returns, nothing at all (Strictly we're returning `Task.FromResult(0);`, which is effectively nothing). 
+You may have noticed what a handler returns, nothing at all (Strictly we're returning `Task.CompletedTask;`, which is effectively nothing). 
 Handlers inform the authorization service they have succeeded by calling `context.Succeed(requirement);`. 
 You may be asking yourself if there is a `context.Succeed()` is there a `context.Fail()`? There is, but if your requirement isn't met you
 shouldn't touch the context at all. Now you may be asking why not? Well ...
@@ -377,12 +377,12 @@ namespace AuthorizationLab
             if (!context.User.HasClaim(c => c.Type == "BadgeNumber" && 
                                             c.Issuer == "https://contoso.com"))
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             context.Succeed(requirement);
 
-			return Task.FromResult(0);
+			return Task.CompletedTask;
         }
     }
 }
@@ -427,14 +427,14 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-			return Task.FromResult(0);
+			return Task.CompletedTask;
         }
     }
 }
 ```
 
 Note that neither handler calls context.Fail(). 
-context.Fail() is there for occassions when authorization cannot continue, even if there's another handler,
+context.Fail() is there for occasions when authorization cannot continue, even if there's another handler,
 for example, "My Entire User Database is on fire." or "The user I'm looking at has just been blocked, but other back-end systems 
 may not yet be updated."
 
@@ -660,7 +660,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-			return Task.FromResult(0);
+			return Task.CompletedTask;
         }
     }
 }
