@@ -382,7 +382,7 @@ namespace AuthorizationLab
 
             context.Succeed(requirement);
 
-			return Task.CompletedTask;
+			 return Task.CompletedTask;
         }
     }
 }
@@ -427,7 +427,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-			return Task.CompletedTask;
+			 return Task.CompletedTask;
         }
     }
 }
@@ -660,7 +660,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-			return Task.CompletedTask;
+			 return Task.CompletedTask;
         }
     }
 }
