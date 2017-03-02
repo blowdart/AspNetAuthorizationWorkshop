@@ -1,41 +1,40 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{34445EFF-069B-43C5-B893-3D62EE196328}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{774A70C4-0D23-4D93-A7AE-41275051070D}"
 	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
 		License.txt = License.txt
 		nuget.config = nuget.config
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "AuthorizationLab", "src\AuthorizationLab\AuthorizationLab.xproj", "{F92337B1-56FF-4392-8E34-A3E787A71FCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthorizationLab", "src\AuthorizationLab\AuthorizationLab.csproj", "{F92337B1-56FF-4392-8E34-A3E787A71FCC}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step_0_MVC_Setup", "src\Step_0_MVC_Setup\Step_0_MVC_Setup.xproj", "{B4399C1F-4A8B-4EA8-95C3-B56EA0F75AAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Step_0_MVC_Setup", "src\Step_0_MVC_Setup\Step_0_MVC_Setup.csproj", "{B4399C1F-4A8B-4EA8-95C3-B56EA0F75AAE}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step_1_Setup_Authorization", "src\Step_1_Setup_Authorization\Step_1_Setup_Authorization.xproj", "{3FA018B3-31DB-4EC7-A6CE-500F08F89FFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Step_1_Setup_Authorization", "src\Step_1_Setup_Authorization\Step_1_Setup_Authorization.csproj", "{3FA018B3-31DB-4EC7-A6CE-500F08F89FFC}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step_3_Roles", "src\Step_3_Roles\Step_3_Roles.xproj", "{662D6156-7F1D-4B79-95A8-B6DF45A0060C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Step_3_Roles", "src\Step_3_Roles\Step_3_Roles.csproj", "{662D6156-7F1D-4B79-95A8-B6DF45A0060C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step_2_Authorize_All_The_Things", "src\Step_2_Authorize_All_The_Things\Step_2_Authorize_All_The_Things.xproj", "{C0D10787-CF72-4DB5-8ED6-64CEEFEB898A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Step_2_Authorize_All_The_Things", "src\Step_2_Authorize_All_The_Things\Step_2_Authorize_All_The_Things.csproj", "{C0D10787-CF72-4DB5-8ED6-64CEEFEB898A}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step_4_Simple_Policies", "src\Step_4_Simple_Policies\Step_4_Simple_Policies.xproj", "{2D74ACE9-CFD4-4B40-9CE5-C9F259A1B281}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Step_4_Simple_Policies", "src\Step_4_Simple_Policies\Step_4_Simple_Policies.csproj", "{2D74ACE9-CFD4-4B40-9CE5-C9F259A1B281}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step_5_Code_Based_Policies", "src\Step_5_Code_Based_Policies\Step_5_Code_Based_Policies.xproj", "{255673E4-48C9-44D8-9E8E-50937B3FE676}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Step_5_Code_Based_Policies", "src\Step_5_Code_Based_Policies\Step_5_Code_Based_Policies.csproj", "{255673E4-48C9-44D8-9E8E-50937B3FE676}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step_6_Multiple_Handlers_For_A_Requirement", "src\Step_6_Multiple_Handlers_For_A_Requirement\Step_6_Multiple_Handlers_For_A_Requirement.xproj", "{BE1EA721-BA8E-4E60-90A4-82AA7027CACE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Step_6_Multiple_Handlers_For_A_Requirement", "src\Step_6_Multiple_Handlers_For_A_Requirement\Step_6_Multiple_Handlers_For_A_Requirement.csproj", "{BE1EA721-BA8E-4E60-90A4-82AA7027CACE}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step_7_Resource_Based_Requirements", "src\Step_7_Resource_Based_Requirements\Step_7_Resource_Based_Requirements.xproj", "{0B99B827-5985-469A-AF5E-FF47F807AF81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Step_7_Resource_Based_Requirements", "src\Step_7_Resource_Based_Requirements\Step_7_Resource_Based_Requirements.csproj", "{0B99B827-5985-469A-AF5E-FF47F807AF81}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Step_8_Authorizing_In_Views", "src\Step_8_Authorizing_In_Views\Step_8_Authorizing_In_Views.xproj", "{8965CAC6-2C58-4245-B5E0-F6C15F3114B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Step_8_Authorizing_In_Views", "src\Step_8_Authorizing_In_Views\Step_8_Authorizing_In_Views.csproj", "{8965CAC6-2C58-4245-B5E0-F6C15F3114B8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Workshop_Start", "src\Workshop_Start\Workshop_Start.xproj", "{89041096-2574-4FCB-9AA9-C251BC2022A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Workshop_Start", "src\Workshop_Start\Workshop_Start.csproj", "{89041096-2574-4FCB-9AA9-C251BC2022A5}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Workshop_Suggested_Solution", "src\Workshop_Suggested_Solution\Workshop_Suggested_Solution.xproj", "{05FCE1EC-7A3D-4370-81F2-EDE9A5F57498}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Workshop_Suggested_Solution", "src\Workshop_Suggested_Solution\Workshop_Suggested_Solution.csproj", "{05FCE1EC-7A3D-4370-81F2-EDE9A5F57498}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,6 @@
 # ASP.NET Core Authorization Lab
 
-This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core RTM.
+This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 1.1 and VS2017.
 
 [Authorization Documentation](https://docs.asp.net/en/latest/security/authorization/index.html).
 
@@ -20,7 +20,7 @@ Create a new, blank, ASP.NET project.
 Add MVC to the app. 
 -------------------
 
-* Right click on the project, choose `Manage NuGet Packages`, search for `Microsoft.AspNetCore.Mvc` and install v1.0.0. 
+* Right click on the project, choose `Manage NuGet Packages`, search for `Microsoft.AspNetCore.Mvc` and install v1.1.1. 
 * Edit `Startup.cs`  and add `services.AddMvc();` to the top of the `ConfigureServices()` method;
 * Edit the `Configure()` method, delete the existing code.
 * In the now empty `Configure();` add the following code to setup MVC default routing;
@@ -771,7 +771,7 @@ Step 8: Authorizing in Views
 
 For resource links and other UI elements you probably want to not show those links to users in the UI, so as to reduce temptation. 
 You still want to keep authorization checks in the Controller - never rely solely on UI element removal as a security mechanism. 
-ASP.NET 5 allows DI within views, so you can use the same approach in Step 7 to hide documents in the document list the current user cannot access.
+ASP.NET Core allows DI within views, so you can use the same approach in Step 7 to hide documents in the document list the current user cannot access.
 
 * Open the Index view file, `Index.cshtml` in the `Documents` folder. 
 * Add an @using statement for `Microsoft.AspNetCore.Authorization` and inject the `AuthorizationService` using the `@inject` command
