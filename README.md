@@ -314,7 +314,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-			return Task.CompletedTask;
+	    return Task.CompletedTask;
         }
     }
 }
@@ -596,7 +596,7 @@ namespace AuthorizationLab.Controllers
 }
 ```
 
-* Create an `Document` folder underneath the `Views` folder and create and Index view, `Index.cshtml`
+* Create a `Document` folder underneath the `Views` folder and create an Index view, `Index.cshtml`
 
 ```
 @using AuthorizationLab
@@ -625,7 +625,7 @@ namespace AuthorizationLab.Controllers
 
 Now we need to define operations to authorize against. For a document this might be Read, Write, Edit and Delete. We provide a base class, OperationAuthorizationRequirement which you can use as a starting point, but it's optional.
 
-* Define an requirement for editing, `EditRequirement.cs`
+* Define a requirement for editing, `EditRequirement.cs`
 
 ```c#
 using Microsoft.AspNetCore.Authorization;
