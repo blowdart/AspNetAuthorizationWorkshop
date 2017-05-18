@@ -1,6 +1,6 @@
 # ASP.NET Core Authorization Lab
 
-This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 1.1 and VS2017.
+This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 2.0 and VS2017.
 
 [Authorization Documentation](https://docs.asp.net/en/latest/security/authorization/index.html).
 
@@ -14,13 +14,13 @@ Create a new, blank, ASP.NET project.
 
 * File > New Project > .NET Core 
 * Select ASP.NET Core Web Application (.NET Core)
+* Ensure ASP.NET Core 2.0 is selected in the version drop down at the top of the dialog.
 * Select the Empty Template
 * Call your solution `AuthorizationLab` if you want to cut and paste the sample code contained in this document.
 
 Add MVC to the app. 
 -------------------
 
-* Right click on the project, choose `Manage NuGet Packages`, search for `Microsoft.AspNetCore.Mvc` and install v1.1.1. 
 * Edit `Startup.cs`  and add `services.AddMvc();` to the top of the `ConfigureServices()` method;
 * Edit the `Configure()` method, delete the existing code.
 * In the now empty `Configure();` add the following code to setup MVC default routing;
@@ -55,30 +55,27 @@ namespace AuthorizationLab.Controllers
 
 * Create a `Views` folder.
 * Create a `Home` folder under the `Views`.
-* Create an `Index.cshtml` file inside the `Views\Home` folder, and edit it to say Hello World.
+* Create an `Index.cshtml` file inside the `Views\Home` folder, and edit it to contain Hello World.
 * Run your application and ensure you see Hello World.
 
-Step 1: Setup authorization
-===========================
+Step 1: Setup authentication
+============================
 
-* Add the `Microsoft.AspNetCore.Authorization` nuget package.
-* Add the `Microsoft.AspNetCore.Authentication.Cookies` nuget package
-* Add `services.AddAuthorization()` at the top of the `ConfigureServices()` method.
-* Edit the Home controller and add the `[Authorize]` attribute to the controller.
-* Run the project and panic. You get a blank page. Open the IE Dev Tools, click Network then refresh the browser. You will see you are getting a 401 returned. The server is telling you that you are unauthorized.
-* Add cookie middleware into the `Configure()` method, before `app.UseMvc()`. This middleware allows you to configure an identity for a request and persist it to a cookie.
+* In ASP.NET Core 2.0 the `Microsoft.AspNetCore.All` metapackage contains all the authentication and authorization packages, so you don't need to add any extra packages or references.
+* Open `startup.cs`
+* Add `app.UseAuthentication();` at the top of the `Configure()` method.
+* Add Cookie middleware to the authentication service by adding the following to the top of the `ConfigureServices()` method.
 
 ```c#
-app.UseCookieAuthentication(new CookieAuthenticationOptions
+services.AddCookieAuthentication("Cookie", options => 
 {
-    AuthenticationScheme = "Cookie",
-    LoginPath = new PathString("/Account/Login/"),
-    AccessDeniedPath = new PathString("/Account/Forbidden/"),
-    AutomaticAuthenticate = true,
-    AutomaticChallenge = true
+    options.LoginPath = new PathString("/Account/Login/");
+    options.AccessDeniedPath = new PathString("/Account/Forbidden/");
 });
 ```
 
+* Edit the Home controller and add the `[Authorize]` attribute to the controller.
+* Run the project and panic. You get a blank page. Open the IE Dev Tools, click Network then refresh the browser. You will see you are getting a 401 returned. The server is telling you that you are unauthorized.
 * Now create an `Account` controller, `AccountController.cs`. Create an `Login()` action and a `Forbidden()` action.
 
 ```c#
@@ -115,7 +112,7 @@ public async Task<IActionResult> Login(string returnUrl = null)
     userIdentity.AddClaims(claims);
     var userPrincipal = new ClaimsPrincipal(userIdentity);
 
-    await HttpContext.Authentication.SignInAsync("Cookie", userPrincipal,
+    await HttpContext.SignInAsync("Cookie", userPrincipal,
         new AuthenticationProperties
         {
             ExpiresUtc = DateTime.UtcNow.AddMinutes(20),

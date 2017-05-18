@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Http.Authentication;
+
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AuthorizationLab.Controllers
 {
@@ -28,7 +29,7 @@ namespace AuthorizationLab.Controllers
 
             var userPrincipal = new ClaimsPrincipal(userIdentity);
 
-            await HttpContext.Authentication.SignInAsync("Cookie", userPrincipal,
+            await HttpContext.SignInAsync("Cookie", userPrincipal,
                 new AuthenticationProperties
                 {
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
