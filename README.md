@@ -171,7 +171,7 @@ Step 2: Authorize all the things
 ```c#
 services.AddMvc(config =>
 {
-    var policy = new AuthorizationPolicyBuilder()
+    var policy = new AuthorizationPolicyBuilder("Cookie")
                      .RequireAuthenticatedUser()
                      .Build();
     config.Filters.Add(new AuthorizeFilter(policy));
