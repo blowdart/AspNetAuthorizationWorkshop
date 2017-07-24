@@ -30,7 +30,9 @@ namespace AuthorizationLab.Controllers
                 return new NotFoundResult();
             }
 
-            if (await _authorizationService.AuthorizeAsync(User, document, new EditRequirement()))
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, document, new EditRequirement());
+
+            if (authorizationResult.Succeeded)
             {
                 return View(document);
             }

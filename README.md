@@ -1,6 +1,6 @@
 # ASP.NET Core Authorization Lab
 
-This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 2.0 and VS2017.
+This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 2.0 RTM and VS2017.
 
 [Authorization Documentation](https://docs.asp.net/en/latest/security/authorization/index.html).
 
@@ -67,11 +67,13 @@ Step 1: Setup authentication
 * Add Cookie middleware to the authentication service by adding the following to the top of the `ConfigureServices()` method.
 
 ```c#
-services.AddCookieAuthentication("Cookie", options => 
-{
-    options.LoginPath = new PathString("/Account/Login/");
-    options.AccessDeniedPath = new PathString("/Account/Forbidden/");
-});
+services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+	.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
+		options => 
+        {
+				options.LoginPath = new PathString("/Account/Login/");
+                options.AccessDeniedPath = new PathString("/Account/Forbidden/");
+        });
 ```
 
 * Edit the Home controller and add the `[Authorize]` attribute to the controller.
@@ -112,7 +114,9 @@ public async Task<IActionResult> Login(string returnUrl = null)
     userIdentity.AddClaims(claims);
     var userPrincipal = new ClaimsPrincipal(userIdentity);
 
-    await HttpContext.SignInAsync("Cookie", userPrincipal,
+    await HttpContext.SignInAsync(
+		CookieAuthenticationDefaults.AuthenticationScheme
+		userPrincipal,
         new AuthenticationProperties
         {
             ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
@@ -748,7 +752,9 @@ namespace AuthorizationLab.Controllers
                 return new NotFoundResult();
             }
 
-            if (await _authorizationService.AuthorizeAsync(User, document, new EditRequirement()))
+
+			var authorizationResult = await AuthorizationService.AuthorizeAsync(User, document, new EditRequirement());
+            if (authorizationResult.Succeeded)
             {
                 return View(document);
             }
@@ -802,7 +808,8 @@ ASP.NET Core allows DI within views, so you can use the same approach in Step 7 
     var requirement = new EditRequirement();
     foreach (var document in Model)
     {
-        if (await AuthorizationService.AuthorizeAsync(User, document, requirement))
+		var authorizationResult = await AuthorizationService.AuthorizeAsync(User, document, new EditRequirement());
+        if (authorizationResult.Succeeded)
         {
         <p>@Html.ActionLink("Document #" + document.Id, "Edit", new { id = document.Id })</p>
         }

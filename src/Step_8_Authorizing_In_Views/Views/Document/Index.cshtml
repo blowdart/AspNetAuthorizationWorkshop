@@ -9,7 +9,9 @@
     var requirement = new EditRequirement();
     foreach (var document in Model)
     {
-        if (await AuthorizationService.AuthorizeAsync(User, document, requirement))
+        var authorizationResult = await AuthorizationService.AuthorizeAsync(User, document, requirement);
+
+        if (authorizationResult.Succeeded)
         {
         <p>@Html.ActionLink("Document #" + document.Id, "Edit", new { id = document.Id })</p>
         }

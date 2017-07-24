@@ -31,7 +31,9 @@ namespace AuthorizationWorkshop.Controllers
                 return View();
             }
 
-            await HttpContext.SignInAsync(Constants.MiddlewareScheme, _userRepository.Get(userName),
+            await HttpContext.SignInAsync(
+                Constants.MiddlewareScheme, 
+                _userRepository.Get(userName),
                 new AuthenticationProperties
                 {
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(20),

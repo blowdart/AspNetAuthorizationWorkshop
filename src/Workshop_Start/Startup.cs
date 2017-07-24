@@ -21,11 +21,13 @@ namespace AuthorizationWorkshop
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCookieAuthentication(Constants.MiddlewareScheme, options =>
-            {
-                options.LoginPath = new PathString("/Account/Login/");
-                options.AccessDeniedPath = new PathString("/Account/Forbidden/");
-            });
+            services.AddAuthentication(Constants.MiddlewareScheme)
+                .AddCookie(Constants.MiddlewareScheme,
+                    options =>
+                    {
+                        options.LoginPath = new PathString("/Account/Login/");
+                        options.AccessDeniedPath = new PathString("/Account/Forbidden/");
+                    });
 
             services.AddAuthorization();
             services.AddMvc();
