@@ -383,7 +383,7 @@ namespace AuthorizationLab
 
             context.Succeed(requirement);
 
-			 return Task.CompletedTask;
+			return Task.CompletedTask;
         }
     }
 }
@@ -428,7 +428,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-			 return Task.CompletedTask;
+			return Task.CompletedTask;
         }
     }
 }
@@ -661,7 +661,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-			 return Task.CompletedTask;
+			return Task.CompletedTask;
         }
     }
 }
@@ -717,7 +717,8 @@ namespace AuthorizationLab.Controllers
 
 Finally we can call the service inside an action method. 
 
-* In the Edit action change it to be async, returning a `Task<IActionResult>` and call the `_authorizeService.AuthorizeAsync` method with the user, resource and the requirement. If the authorization call fails you should return a `ChallengeResult();`
+* In the Edit action change it to be async, returning a `Task<IActionResult>`, add an `Authorize` attribute to ensure we have a user to check, and finally call the `_authorizeService.AuthorizeAsync` method with the user, resource and the requirement. 
+If the authorization call fails you should return a `ForbidResult();`, as the current user is forbidden to perform the action.
 
 ```c#
 using System.Threading.Tasks;
@@ -743,6 +744,7 @@ namespace AuthorizationLab.Controllers
             return View(_documentRepository.Get());
         }
 
+		[Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             var document = _documentRepository.Get(id);
@@ -760,14 +762,14 @@ namespace AuthorizationLab.Controllers
             }
             else
             {
-                return new ChallengeResult();
+                return new ForbidResult();
             }
         }
     }
 }
 ```
 
-* Run the app and go to the Document URL. You should be able to click through and see Document 1 but not Document 2. 
+* Run the app and go to the Document URL. You should be able to click through on each document and see Document 1 but not Document 2, because you don't have access to it. 
 
 Step 8: Authorizing in Views
 ============================

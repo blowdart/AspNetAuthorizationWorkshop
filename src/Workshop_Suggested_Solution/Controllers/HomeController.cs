@@ -56,7 +56,7 @@ namespace AuthorizationWorkshop.Controllers
                 return View(album);
             }
 
-            return new ChallengeResult();
+            return new ForbidResult();
         }
 
         [Authorize(Policy = PolicyNames.AdministratorsOnly)]

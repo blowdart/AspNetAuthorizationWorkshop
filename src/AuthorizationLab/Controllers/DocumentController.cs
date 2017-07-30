@@ -21,6 +21,7 @@ namespace AuthorizationLab.Controllers
             return View(_documentRepository.Get());
         }
 
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             var document = _documentRepository.Get(id);
@@ -38,7 +39,7 @@ namespace AuthorizationLab.Controllers
             }
             else
             {
-                return new ChallengeResult();
+                return new ForbidResult();
             }
         }
     }
