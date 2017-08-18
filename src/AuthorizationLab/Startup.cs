@@ -15,7 +15,7 @@ namespace AuthorizationLab
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
-                    options => 
+                    options =>
                     {
                         options.LoginPath = new PathString("/Account/Login/");
                         options.AccessDeniedPath = new PathString("/Account/Forbidden/");

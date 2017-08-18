@@ -9,7 +9,7 @@ namespace AuthorizationLab.Controllers
         IDocumentRepository _documentRepository;
         IAuthorizationService _authorizationService;
 
-        public DocumentController(IDocumentRepository documentRepository, 
+        public DocumentController(IDocumentRepository documentRepository,
                                   IAuthorizationService authorizationService)
         {
             _documentRepository = documentRepository;
