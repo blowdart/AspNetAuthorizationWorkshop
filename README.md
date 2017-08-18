@@ -115,7 +115,7 @@ public async Task<IActionResult> Login(string returnUrl = null)
     var userPrincipal = new ClaimsPrincipal(userIdentity);
 
     await HttpContext.SignInAsync(
-		CookieAuthenticationDefaults.AuthenticationScheme
+		CookieAuthenticationDefaults.AuthenticationScheme,
 		userPrincipal,
         new AuthenticationProperties
         {
