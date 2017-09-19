@@ -2,7 +2,7 @@
 
 This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 1.1 and VS2017.
 
-A version of this workship for ASP.NET Core 2.0 is available, as a work in progress in the [Core2](https://github.com/blowdart/AspNetAuthorizationWorkshop/tree/core2) branch.
+A version of this workshop for ASP.NET Core 2.0 is available, as a work in progress in the [Core2](https://github.com/blowdart/AspNetAuthorizationWorkshop/tree/core2) branch.
 
 [Authorization Documentation](https://docs.asp.net/en/latest/security/authorization/index.html).
 
