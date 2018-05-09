@@ -1,6 +1,6 @@
 # ASP.NET Core Authorization Lab
 
-This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 2.0 RTM and VS2017.
+This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 2.0 RTM and VS2017. (If you're still using 1.x then the older version of the labs are available in the [Core1x](https://github.com/blowdart/AspNetAuthorizationWorkshop/tree/Core1x) branch.)
 
 This lab uses the Model-View-Controller template as that's what everyone has been using up until now and it's the most familiar starting point for the vast majority of people.
 
