@@ -21,11 +21,15 @@ else
 {
     <p>
         @Html.ActionLink(album.Title, "Details", new { id = album.Id }) by @album.Artist.
-        @if (User.Identity.IsAuthenticated &&
-             await AuthorizationService.AuthorizeAsync(User, album, PolicyNames.CanEditAlbum))
+        @if (User.Identity.IsAuthenticated)
         {
-            <text>&nbsp;| &nbsp;</text>
-            @Html.ActionLink("Edit", "Edit", new { id = album.Id })
+            var authorizationResult = await AuthorizationService.AuthorizeAsync(User, album, PolicyNames.CanEditAlbum);
+
+            if (authorizationResult.Succeeded)
+            {
+                <text>&nbsp;| &nbsp;</text>
+                @Html.ActionLink("Edit", "Edit", new { id = album.Id })
+            }
         }
         <br />
         Published by @album.Publisher

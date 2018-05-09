@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 
 using AuthorizationWorkshop.Repositories;
@@ -31,7 +31,9 @@ namespace AuthorizationWorkshop.Controllers
                 return View();
             }
 
-            await HttpContext.Authentication.SignInAsync("Cookie", _userRepository.Get(userName),
+            await HttpContext.SignInAsync(
+                Constants.MiddlewareScheme, 
+                _userRepository.Get(userName),
                 new AuthenticationProperties
                 {
                     ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
@@ -44,7 +46,7 @@ namespace AuthorizationWorkshop.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.Authentication.SignOutAsync(Constants.MiddlewareScheme);
+            await HttpContext.SignOutAsync(Constants.MiddlewareScheme);
 
             return RedirectToAction("Index", "Home");
         }

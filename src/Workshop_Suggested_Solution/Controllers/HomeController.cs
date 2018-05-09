@@ -46,15 +46,17 @@ namespace AuthorizationWorkshop.Controllers
                 return new NotFoundResult();
             }
 
-            if (await _authorizationService.AuthorizeAsync(
+            var authorizationResult = await _authorizationService.AuthorizeAsync(
                 User,
                 album,
-                PolicyNames.CanEditAlbum))
+                PolicyNames.CanEditAlbum);
+
+            if (authorizationResult.Succeeded)
             {
                 return View(album);
             }
 
-            return new ChallengeResult();
+            return new ForbidResult();
         }
 
         [Authorize(Policy = PolicyNames.AdministratorsOnly)]
@@ -68,10 +70,12 @@ namespace AuthorizationWorkshop.Controllers
                 return new NotFoundResult();
             }
 
-            if (await _authorizationService.AuthorizeAsync(
+            var authorizationResult = await _authorizationService.AuthorizeAsync(
                 User,
                 existingAlbum,
-                PolicyNames.CanEditAlbum))
+                PolicyNames.CanEditAlbum);
+
+            if (authorizationResult.Succeeded)
             {
                 _albumRepository.Update(album);
                 return View(album);

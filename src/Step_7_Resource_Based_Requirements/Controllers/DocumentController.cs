@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AuthorizationLab.Controllers
 {
+
     public class DocumentController : Controller
     {
         IDocumentRepository _documentRepository;
@@ -21,6 +22,7 @@ namespace AuthorizationLab.Controllers
             return View(_documentRepository.Get());
         }
 
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             var document = _documentRepository.Get(id);
@@ -30,13 +32,15 @@ namespace AuthorizationLab.Controllers
                 return new NotFoundResult();
             }
 
-            if (await _authorizationService.AuthorizeAsync(User, document, new EditRequirement()))
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, document, new EditRequirement());
+
+            if (authorizationResult.Succeeded)
             {
                 return View(document);
             }
             else
             {
-                return new ChallengeResult();
+                return new ForbidResult();
             }
         }
     }

@@ -1,10 +1,10 @@
 # ASP.NET Core Authorization Lab
 
-This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 1.1 and VS2017.
+This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 2.0 RTM and VS2017.
 
-A version of this workshop for ASP.NET Core 2.0 is available, as a work in progress in the [Core2](https://github.com/blowdart/AspNetAuthorizationWorkshop/tree/core2) branch.
+This lab uses the Model-View-Controller template as that's what everyone has been using up until now and it's the most familiar starting point for the vast majority of people.
 
-[Authorization Documentation](https://docs.asp.net/en/latest/security/authorization/index.html).
+Official [authorization documentation](https://docs.asp.net/en/latest/security/authorization/index.html) is at https://docs.asp.net/en/latest/security/authorization/index.html.
 
 *Tip: When you stop finish running the app at each stage always close the browser to clear the identity cookie.*
 
@@ -16,13 +16,13 @@ Create a new, blank, ASP.NET project.
 
 * File > New Project > .NET Core 
 * Select ASP.NET Core Web Application (.NET Core)
+* Ensure ASP.NET Core 2.0 is selected in the version drop down at the top of the dialog.
 * Select the Empty Template
 * Call your solution `AuthorizationLab` if you want to cut and paste the sample code contained in this document.
 
 Add MVC to the app. 
 -------------------
 
-* Right click on the project, choose `Manage NuGet Packages`, search for `Microsoft.AspNetCore.Mvc` and install v1.1.1. 
 * Edit `Startup.cs`  and add `services.AddMvc();` to the top of the `ConfigureServices()` method;
 * Edit the `Configure()` method, delete the existing code.
 * In the now empty `Configure();` add the following code to setup MVC default routing;
@@ -57,30 +57,29 @@ namespace AuthorizationLab.Controllers
 
 * Create a `Views` folder.
 * Create a `Home` folder under the `Views`.
-* Create an `Index.cshtml` file inside the `Views\Home` folder, and edit it to say Hello World.
+* Create an `Index.cshtml` file inside the `Views\Home` folder, and edit it to contain Hello World.
 * Run your application and ensure you see Hello World.
 
-Step 1: Setup authorization
-===========================
+Step 1: Setup authentication
+============================
 
-* Add the `Microsoft.AspNetCore.Authorization` nuget package.
-* Add the `Microsoft.AspNetCore.Authentication.Cookies` nuget package
-* Add `services.AddAuthorization()` at the top of the `ConfigureServices()` method.
-* Edit the Home controller and add the `[Authorize]` attribute to the controller.
-* Run the project and panic. You get a blank page. Open the IE Dev Tools, click Network then refresh the browser. You will see you are getting a 401 returned. The server is telling you that you are unauthorized.
-* Add cookie middleware into the `Configure()` method, before `app.UseMvc()`. This middleware allows you to configure an identity for a request and persist it to a cookie.
+* In ASP.NET Core 2.0 the `Microsoft.AspNetCore.All` meta package contains all the authentication and authorization packages, so you don't need to add any extra packages or references.
+* Open `startup.cs`
+* Add `app.UseAuthentication();` at the top of the `Configure()` method.
+* Add Cookie middleware to the authentication service by adding the following to the top of the `ConfigureServices()` method.
 
 ```c#
-app.UseCookieAuthentication(new CookieAuthenticationOptions
-{
-    AuthenticationScheme = "Cookie",
-    LoginPath = new PathString("/Account/Login/"),
-    AccessDeniedPath = new PathString("/Account/Forbidden/"),
-    AutomaticAuthenticate = true,
-    AutomaticChallenge = true
-});
+services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
+        options => 
+        {
+                options.LoginPath = new PathString("/Account/Login/");
+                options.AccessDeniedPath = new PathString("/Account/Forbidden/");
+        });
 ```
 
+* Edit the Home controller and add the `[Authorize]` attribute to the controller.
+* Run the project and panic. You get a blank page. Open the IE Dev Tools, click Network then refresh the browser. You will see you are getting a 404 returned as you have no login page.
 * Now create an `Account` controller, `AccountController.cs`. Create an `Login()` action and a `Forbidden()` action.
 
 ```c#
@@ -117,7 +116,9 @@ public async Task<IActionResult> Login(string returnUrl = null)
     userIdentity.AddClaims(claims);
     var userPrincipal = new ClaimsPrincipal(userIdentity);
 
-    await HttpContext.Authentication.SignInAsync("Cookie", userPrincipal,
+    await HttpContext.SignInAsync(
+        CookieAuthenticationDefaults.AuthenticationScheme,
+        userPrincipal,
         new AuthenticationProperties
         {
             ExpiresUtc = DateTime.UtcNow.AddMinutes(20),
@@ -206,8 +207,8 @@ claims.Add(new Claim(ClaimTypes.Role, "Administrator", ClaimValueTypes.String, I
 
 Step 4: Simple Policies
 =======================
-* Return to `Startup.cs` and locate the `services.AddAuthorization()` in `ConfigureServices()` call.
-* Add a policy to the configuration.
+* Return to `Startup.cs` and locate the `services.AddAuthentication()` call in `ConfigureServices()` call.
+* After `services.AddAuthentication()` add a call to `services.AddAuthorization()` and create a simple policy as shown below.
 
 ```c#
 services.AddAuthorization(options =>
@@ -216,13 +217,14 @@ services.AddAuthorization(options =>
 });
 ```
 
+* This policy is the equivalent of the Role check you used in the `Authorize` attribute parameters in Step 3. 
 * Now change the Home controller `Authorize` attribute to require a policy, rather than use the role parameter.
 
 ```c#
 [Authorize(Policy = "AdministratorOnly")]
 ```
 
-* Run the app and confirm you still see the home page. All that has changed is how you're specifing your requirements. Instead of embedding the role name in the attribute you've written a policy which specifies the role name.
+* Run the app and confirm you still see the home page. All that has changed is how you're specifying your requirements. Instead of embedding the role name in the attribute you've written a policy which specifies the role name.
 * Close your browser to clear your identity cookie.
 * Now add a second policy, this time requiring a claim.
 
@@ -260,7 +262,7 @@ options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123
 claims.Add(new Claim("EmployeeId", "123", ClaimValueTypes.String, Issuer));
 ```
 
-If a policy has multiple claims all claims must be fufilled for authorization to succeed.
+If a policy has multiple claims all claims must be fulfilled for authorization to succeed.
 
 *Remember to close the browser to clear the identity cookie before moving on to the next step.*
 
@@ -294,8 +296,8 @@ namespace AuthorizationLab
         }
 
         protected override Task HandleRequirementAsync(
-		    AuthorizationHandlerContext context, 
-			MinimumAgeRequirement requirement)
+            AuthorizationHandlerContext context, 
+            MinimumAgeRequirement requirement)
         {
             if (!context.User.HasClaim(c => c.Type == ClaimTypes.DateOfBirth))
             {
@@ -316,7 +318,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-	    return Task.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }
@@ -346,7 +348,7 @@ Sometimes you may want multiple handlers for an Authorization Requirement,
 for example when there are multiple ways to fulfill a requirement. Microsoft's office doors 
 open with your Microsoft badge, however on days you forget your badge you can go to 
 reception and get a temporary pass and the receptionist will let you through the gates. 
-Thus there are two ways to fufill the single entry requirement.
+Thus there are two ways to fulfill the single entry requirement.
 In the ASP.NET Core authorization model this would be implemented as two handlers for a single requirement.
 
 * First, write a new `IAuthorizationRequirement`, `OfficeEntryRequirement`.
@@ -373,8 +375,8 @@ namespace AuthorizationLab
     public class HasBadgeHandler : AuthorizationHandler<OfficeEntryRequirement>
     {
         protected override Task HandleRequirementAsync(
-		  AuthorizationHandlerContext context, 
-		  OfficeEntryRequirement requirement)
+          AuthorizationHandlerContext context, 
+          OfficeEntryRequirement requirement)
         {
             if (!context.User.HasClaim(c => c.Type == "BadgeNumber" && 
                                             c.Issuer == "https://contoso.com"))
@@ -384,7 +386,7 @@ namespace AuthorizationLab
 
             context.Succeed(requirement);
 
-			 return Task.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }
@@ -397,7 +399,7 @@ issued the claim, so in our case it's who issued the badge).
 But what about those who forget and have 
 a temporary badge? You could just put it all in one handler, but handlers and requirements are 
 meant to be reusable. You could use the `HasBadgeHandler` shown above for other things, not just office entry 
-(for example the Microsoft code signing infrastructure needs the smartcard that is our office badge to trigger jobs).
+(for example the Microsoft code signing infrastructure needs the smart card that is our office badge to trigger jobs).
 
 * To cope with temporary badges write another `AuthorizationHandler`, `HasTemporaryPassHandler`
 
@@ -410,13 +412,13 @@ namespace AuthorizationLab
     public class HasTemporaryPassHandler : AuthorizationHandler<OfficeEntryRequirement>
     {
         protected override Task HandleRequirementAsync(
-		  AuthorizationHandlerContext context, 
-		  OfficeEntryRequirement requirement)
+          AuthorizationHandlerContext context, 
+          OfficeEntryRequirement requirement)
         {
             if (!context.User.HasClaim(c => c.Type == "TemporaryBadgeExpiry" &&
                                             c.Issuer == "https://contoso.com"))
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }
 
             var temporaryBadgeExpiry = 
@@ -429,7 +431,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-			 return Task.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }
@@ -474,19 +476,19 @@ services.AddSingleton<IAuthorizationHandler, HasTemporaryPassHandler>();
 
 ```c#
 claims.Add(new Claim("TemporaryBadgeExpiry", 
-	                 DateTime.Now.AddDays(1).ToString(), 
-	                 ClaimValueTypes.String, 
-	                 Issuer));
+                     DateTime.Now.AddDays(1).ToString(), 
+                     ClaimValueTypes.String, 
+                     Issuer));
 ```
 
-* Run the app, and you're still authorized because now the handler for temporary badges fufills the building entry requirement.
+* Run the app, and you're still authorized because now the handler for temporary badges fulfills the building entry requirement.
 * Change the temporary badge claim so it has expired; remembering to close the browser to clear the identity cookie before running your new code.
 
 ```c#
 claims.Add(new Claim("TemporaryBadgeExpiry", 
-	                 DateTime.Now.AddDays(-1).ToString(), 
-	                 ClaimValueTypes.String, 
-	                 Issuer));
+                     DateTime.Now.AddDays(-1).ToString(), 
+                     ClaimValueTypes.String, 
+                     Issuer));
 ```
 
 * Rerun the app and you'll see you're forbidden.
@@ -653,8 +655,8 @@ namespace AuthorizationLab
     public class DocumentEditHandler : AuthorizationHandler<EditRequirement, Document>
     {
         protected override Task HandleRequirementAsync(
-			AuthorizationHandlerContext context, 
-			EditRequirement requirement, 
+            AuthorizationHandlerContext context, 
+            EditRequirement requirement, 
             Document resource)
         {
             if (resource.Author == context.User.FindFirst(ClaimTypes.Name).Value)
@@ -662,7 +664,7 @@ namespace AuthorizationLab
                 context.Succeed(requirement);
             }
 
-			 return Task.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }
@@ -676,7 +678,7 @@ services.AddSingleton<IAuthorizationHandler, DocumentEditHandler>();
 
 We cannot use resource handlers in attributes, because binding hasn't happened at that point and we need the resource. The resource only becomes available inside the action method. So we must call the authorization service directly.
 
-* Return to the Document controller and edit the constructor to include IAuthorizationService as one of its parameters and store it in a local variable.
+* Return to the Document controller and edit the constructor to include `IAuthorizationService` as one of its parameters and store it in a local variable.
 
 ```c#
 using Microsoft.AspNetCore.Authorization;
@@ -718,7 +720,8 @@ namespace AuthorizationLab.Controllers
 
 Finally we can call the service inside an action method. 
 
-* In the Edit action change it to be async, returning a `Task<IActionResult>` and call the `_authorizeService.AuthorizeAsync` method with the user, resource and the requirement. If the authorization call fails you should return a `ChallengeResult();`
+* In the Edit action change it to be async, returning a `Task<IActionResult>`, add an `Authorize` attribute to ensure we have a user to check, and finally call the `_authorizeService.AuthorizeAsync` method with the user, resource and the requirement. 
+If the authorization call fails you should return a `ForbidResult();`, as the current user is forbidden to perform the action.
 
 ```c#
 using System.Threading.Tasks;
@@ -744,6 +747,7 @@ namespace AuthorizationLab.Controllers
             return View(_documentRepository.Get());
         }
 
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             var document = _documentRepository.Get(id);
@@ -753,20 +757,22 @@ namespace AuthorizationLab.Controllers
                 return new NotFoundResult();
             }
 
-            if (await _authorizationService.AuthorizeAsync(User, document, new EditRequirement()))
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, document, new EditRequirement());
+            if (authorizationResult.Succeeded)
             {
                 return View(document);
             }
             else
             {
-                return new ChallengeResult();
+                return new ForbidResult();
             }
         }
     }
 }
 ```
 
-* Run the app and go to the Document URL. You should be able to click through and see Document 1 but not Document 2. 
+* Run the app and go to the Document URL. You should be able to click through on each document and see Document 1 but not Document 2, because you don't have access to it. 
 
 Step 8: Authorizing in Views
 ============================
@@ -807,7 +813,8 @@ ASP.NET Core allows DI within views, so you can use the same approach in Step 7 
     var requirement = new EditRequirement();
     foreach (var document in Model)
     {
-        if (await AuthorizationService.AuthorizeAsync(User, document, requirement))
+        var authorizationResult = await AuthorizationService.AuthorizeAsync(User, document, requirement);
+        if (authorizationResult.Succeeded)
         {
         <p>@Html.ActionLink("Document #" + document.Id, "Edit", new { id = document.Id })</p>
         }
@@ -821,7 +828,7 @@ Applying what you've learnt
 ===========================
 
 Open the `Workshop_Start` folder. 
-	
+    
 This is a sample web site for inventory control. The site allows record label employees to update the details of albums.
 
 There are 3 users, barryd, davidfowl and dedwards. barryd is an administrator for Paddy Productions. dewards is an administrator for ToneDeaf Records. davidfowl is an employee of ToneDeaf Records, but not an administrator. Administrators are part of the Administrator role.

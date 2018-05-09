@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 
 using AuthorizationWorkshop.Repositories;
+using Microsoft.AspNetCore.Authentication;
 
 namespace AuthorizationWorkshop.Controllers
 {
@@ -34,7 +35,7 @@ namespace AuthorizationWorkshop.Controllers
 
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.Authentication.SignOutAsync(Constants.MiddlewareScheme);
+            await HttpContext.SignOutAsync(Constants.MiddlewareScheme);
 
             return RedirectToAction("Index", "Home");
         }

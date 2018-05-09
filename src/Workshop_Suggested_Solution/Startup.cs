@@ -12,19 +12,23 @@ namespace AuthorizationWorkshop
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath);
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(Constants.MiddlewareScheme)
+                .AddCookie(Constants.MiddlewareScheme,
+                    options =>
+                    {
+                        options.LoginPath = new PathString("/Account/Login/");
+                        options.AccessDeniedPath = new PathString("/Account/Forbidden/");
+                    });
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(PolicyNames.AdministratorsOnly,
@@ -48,11 +52,8 @@ namespace AuthorizationWorkshop
             services.AddSingleton<IAuthorizationHandler, AlbumOwnerAuthorizationHandler>();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -62,16 +63,8 @@ namespace AuthorizationWorkshop
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseAuthentication();
             app.UseStaticFiles();
-
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
-            {
-                AuthenticationScheme = Constants.MiddlewareScheme,
-                LoginPath = new PathString("/Account/Login/"),
-                AccessDeniedPath = new PathString("/Account/Forbidden/"),
-                AutomaticAuthenticate = true,
-                AutomaticChallenge = true
-            });
 
             app.UseMvc(routes =>
             {

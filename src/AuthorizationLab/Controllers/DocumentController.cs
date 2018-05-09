@@ -9,7 +9,7 @@ namespace AuthorizationLab.Controllers
         IDocumentRepository _documentRepository;
         IAuthorizationService _authorizationService;
 
-        public DocumentController(IDocumentRepository documentRepository, 
+        public DocumentController(IDocumentRepository documentRepository,
                                   IAuthorizationService authorizationService)
         {
             _documentRepository = documentRepository;
@@ -21,6 +21,7 @@ namespace AuthorizationLab.Controllers
             return View(_documentRepository.Get());
         }
 
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             var document = _documentRepository.Get(id);
@@ -30,13 +31,15 @@ namespace AuthorizationLab.Controllers
                 return new NotFoundResult();
             }
 
-            if (await _authorizationService.AuthorizeAsync(User, document, new EditRequirement()))
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, document, new EditRequirement());
+
+            if (authorizationResult.Succeeded)
             {
                 return View(document);
             }
             else
             {
-                return new ChallengeResult();
+                return new ForbidResult();
             }
         }
     }
