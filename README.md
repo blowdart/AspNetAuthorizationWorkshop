@@ -1,6 +1,6 @@
 # ASP.NET Core Authorization Lab
 
-This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 2.0 RTM and VS2017. (If you're still using 1.x then the older version of the labs are available in the [Core1x](https://github.com/blowdart/AspNetAuthorizationWorkshop/tree/Core1x) branch.)
+This is walk through for an ASP.NET Core Authorization Lab, now updated for ASP.NET Core 2.1 and VS2017. (If you're still using 1.x then the older version of the labs are available in the [Core1x](https://github.com/blowdart/AspNetAuthorizationWorkshop/tree/Core1x) branch.)
 
 This lab uses the Model-View-Controller template as that's what everyone has been using up until now and it's the most familiar starting point for the vast majority of people.
 
@@ -14,11 +14,9 @@ Step 0: Preparation
 Create a new, blank, ASP.NET project.
 -------------------------------------
 
-* File > New Project > .NET Core 
-* Select ASP.NET Core Web Application (.NET Core)
-* Ensure ASP.NET Core 2.0 is selected in the version drop down at the top of the dialog.
-* Select the Empty Template
-* Call your solution `AuthorizationLab` if you want to cut and paste the sample code contained in this document.
+* File > New Project > Visual C# > .NET Core 
+* Select ASP.NET Core Web Application, give the project a name of `AuthorizationLab` and click OK.
+* Select the Empty Template, ensure that ASP.NET Core 2.1 is selected in the drop down above the project types and click OK.
 
 Add MVC to the app. 
 -------------------
@@ -63,7 +61,7 @@ namespace AuthorizationLab.Controllers
 Step 1: Setup authentication
 ============================
 
-* In ASP.NET Core 2.0 the `Microsoft.AspNetCore.All` meta package contains all the authentication and authorization packages, so you don't need to add any extra packages or references.
+* In ASP.NET Core 2.1 the `Microsoft.AspNetCore.App` meta package contains all the authentication and authorization packages, so you don't need to add any extra packages or references.
 * Open `startup.cs`
 * Add `app.UseAuthentication();` at the top of the `Configure()` method.
 * Add Cookie middleware to the authentication service by adding the following to the top of the `ConfigureServices()` method.
@@ -79,8 +77,8 @@ services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 ```
 
 * Edit the Home controller and add the `[Authorize]` attribute to the controller.
-* Run the project and panic. You get a blank page. Open the IE Dev Tools, click Network then refresh the browser. You will see you are getting a 404 returned as you have no login page.
-* Now create an `Account` controller, `AccountController.cs`. Create an `Login()` action and a `Forbidden()` action.
+* Run the project and panic. You get a 404 error. you have no login page.
+* Now create an `Account` controller, `AccountController.cs` in the `Controllers` folder. Create an `Login()` action and a `Forbidden()` action.
 
 ```c#
 using Microsoft.AspNetCore.Mvc;
@@ -104,7 +102,7 @@ namespace AuthorizationLab.Controllers
 
 * Create an `Account` folder under the `Views` folder and create corresponding views for the actions, `Login.cshtml` and `Forbidden.cshtml`. 
 * Add some text to each view so you can tell which view is being displayed, and run your project. You will see you end up at the Login view.
-* Return to the `Account` controller. Change the `Login` action to create a `principal` and persist it using the code below. This will create user information and put it inside a cookie. This fakes what would normally happen in a forms based login system.
+* Return to the `Account` controller. Change the `Login` action to create a `Principal` and persist it using the code below. This will create user information and put it inside a cookie. This fakes what would normally happen in a forms based login system.
 
 ```c#
 public async Task<IActionResult> Login(string returnUrl = null)
@@ -187,7 +185,7 @@ services.AddMvc(config =>
 Step 3: Roles
 =============
 
-* Go to the `Home` controller and add an `Authorize` attribute with a role demand;
+* Go to the `Home` controller and add an `Authorize` attribute with a role demand to either the controller, or the Index action method;
 
 ```c#
 [Authorize(Roles = "Administrator")]
@@ -262,7 +260,7 @@ options.AddPolicy("EmployeeId", policy => policy.RequireClaim("EmployeeId", "123
 claims.Add(new Claim("EmployeeId", "123", ClaimValueTypes.String, Issuer));
 ```
 
-If a policy has multiple claims all claims must be fulfilled for authorization to succeed.
+If a policy has multiple claim requirements all the claim requirements must be fulfilled for authorization to succeed.
 
 *Remember to close the browser to clear the identity cookie before moving on to the next step.*
 
@@ -282,6 +280,7 @@ claims.Add(new Claim(ClaimTypes.DateOfBirth, "1970-06-08", ClaimValueTypes.Date)
 ```c#
 using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
 namespace AuthorizationLab
